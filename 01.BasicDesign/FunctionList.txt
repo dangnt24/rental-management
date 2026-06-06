@@ -1,0 +1,91 @@
+🏠 1. Quản lý phòng
+Thêm / sửa / xoá phòng
+- Tên phòng
+- Trạng thái: Trống, Đang thuê, Đang sửa
+- Giá phòng
+- Số người tối đa
+- Hình ảnh
+- Mô tả 
+
+👉 Đây là bảng Room
+
+👤 2. Quản lý người thuê
+Thêm người thuê
+Thông tin:
+- Họ tên
+- Email
+- Giới tính
+- Password
+- SĐT
+- CCCD
+- Ngày sinh
+- Địa chỉ
+- Ngày vào
+- Avatar
+- Ảnh CCCD
+- Trạng thái
+
+👉 Bảng Tenant (hoặc Customer)
+
+📄 3. Hợp đồng thuê
+- Ngày bắt đầu
+- Ngày kết thúc
+- Tiền cọc
+- Giá thuê
+- Trạng thái (còn hiệu lực / hết hạn)
+
+👉 Quan trọng để sau này tính tiền chuẩn
+
+💰 4. Tính tiền phòng hàng tháng (CỰC KỲ QUAN TRỌNG) - bảng như category của các loại phí
+- Điện (theo số)
+- Nước
+- Dịch vụ (wifi, rác, xe,...)
+
+Invoice (hóa đơn)
+🔌 5. Nhập chỉ số điện nước
+Nhập số điện tháng này
+Tự tính tiêu thụ = mới - cũ
+
+👉 Giúp tự động hóa
+
+📢 6. Quản lý thanh toán
+Đã trả / chưa trả
+Ngày trả
+Số tiền
+📊 7. Dashboard (tổng quan)
+Tổng số phòng
+Phòng đang thuê
+Phòng trống
+Tổng tiền tháng
+
+1. Thông báo đóng tiền
+Hiển thị danh sách phòng chưa đóng tiền
+(Gmail)
+📅 2. Quản lý lịch sử
+Lịch sử thuê phòng
+Lịch sử thanh toán
+🛠 3. Quản lý sự cố / bảo trì
+Phòng bị hư điện, nước
+Trạng thái xử lý
+- Giá xử lý, nguyên nhân, giải pháp, ảnh
+📑 4. In / xuất hóa đơn
+Xuất PDF
+🔍 5. Tìm kiếm + lọc
+Theo tên
+Theo phòng
+Theo trạng thái
+
+Nhắc đóng tiền
+
+2. Phân quyền
+Chủ trọ
+Nhân viên
+Quản lý
+
+📈 3. Báo cáo nâng cao
+Doanh thu theo tháng
+Tỉ lệ lấp phòng
+
+🌐 4. Cho khách thuê xem online
+Xem tiền phòng
+Xem lịch sử
