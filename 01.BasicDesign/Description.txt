@@ -1,0 +1,64 @@
+1. Tech Stack
+Backend
+ASP.NET Core Web API (.NET 8 LTS)
+Entity Framework Core
+PostgreSQL
+JWT Authentication
+Role-based Authorization (Admin, Manager, Tenant)
+RESTful API
+AutoMapper
+FluentValidation
+Serilog Logging
+Dependency Injection
+Repository Pattern + Service Layer
+BL + DAO
+
+Frontend
+React
+Vite
+TypeScript
+TailwindCSS
+React Router
+Axios
+React Hook Form
+Zod hoặc Yup Validation
+TanStack Query (React Query)
+Zustand hoặc Redux Toolkit
+
+Database
+PostgreSQL
+
+Sử dụng:
+
+Migration
+Seed Data
+Index
+Foreign Key
+Transaction
+Soft Delete
+Audit Fields
+Authentication
+JWT Access Token
+Refresh Token
+Role Permission
+Password Hash (BCrypt hoặc MD5)
+
+DevOps
+Git
+GitHub
+Docker
+Docker Compose
+GitHub Actions CI/CD
+Deployment
+
+Frontend:
+
+Vercel (Free)
+
+Backend:
+
+Render hoặc VPS Docker
+
+Database:
+
+PostgreSQL hoặc Neon

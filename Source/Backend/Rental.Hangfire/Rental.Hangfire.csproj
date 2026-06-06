@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.8.11" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
+    <ProjectReference Include="..\Rental.Core\Rental.Core.csproj" />
+    <ProjectReference Include="..\Rental.Persistence\Rental.Persistence.csproj" />
+    <ProjectReference Include="..\Rental.Mail\Rental.Mail.csproj" />
+  </ItemGroup>
+</Project>

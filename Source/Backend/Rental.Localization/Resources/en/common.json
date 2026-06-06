@@ -1,0 +1,8 @@
+{
+  "Success": "Success",
+  "Error": "Error",
+  "NotFound": "Data not found",
+  "Unauthorized": "Unauthorized",
+  "LoginFailed": "Login failed",
+  "ValidationError": "Validation error"
+}

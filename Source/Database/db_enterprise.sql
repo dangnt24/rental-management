@@ -1,8 +1,12 @@
 -- =============================================================================
--- DATABASE DESIGN: RENTAL MANAGEMENT SYSTEM (CORE ARCHITECTURE)
--- AUTHOR: GEMINI AI EXPERT
+-- DATABASE DESIGN: ENTERPRISE RENTAL MANAGEMENT SYSTEM (CORE ARCHITECTURE)
+-- AUTHOR: GEMINI AI EXPERT (SENIOR SOLUTION ARCHITECT)
 -- TARGET: POSTGRESQL 15+
+-- FEATURES: AUDIT FIELDS, SOFT DELETE, VERSIONING, INDEXING, CONSTRAINTS
 -- =============================================================================
+
+-- Extension for UUID generation
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- -----------------------------------------------------------------------------
 -- 1. SYSTEM TABLES (sy_)
@@ -11,42 +15,90 @@
 -- Bảng quản lý danh mục chung (Trạng thái, Giới tính, Loại phí...)
 CREATE TABLE sy_commons (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    type VARCHAR(50) NOT NULL,          -- VD: 'ROOM_STATUS', 'GENDER', 'PAYMENT_METHOD'
-    code VARCHAR(50) NOT NULL,          -- VD: 'AVAILABLE', 'MALE', 'CASH'
+    type VARCHAR(50) NOT NULL,
+    code VARCHAR(50) NOT NULL,
     name_vi TEXT NOT NULL,
     name_en TEXT,
     sort_order INT DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
     remark TEXT,
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
     updated_date TIMESTAMP,
-    data_row_version INT DEFAULT 1,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1,
+    
     UNIQUE(type, code)
 );
 
 -- Bảng quản lý file tập trung
 CREATE TABLE sy_file_attachments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    table_name VARCHAR(50),             -- Bảng liên kết (VD: ms_rooms)
-    ref_id INT,                         -- ID của dòng trong bảng đó
+    table_name VARCHAR(50),
+    ref_id INT,
     file_name TEXT NOT NULL,
     file_path TEXT NOT NULL,
     file_type VARCHAR(50),
     file_size BIGINT,
+    
+    -- Audit Fields
+    created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_deleted BOOLEAN DEFAULT FALSE
+    updated_by VARCHAR(50),
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
 -- Bảng phân quyền (Roles)
 CREATE TABLE sy_roles (
     role_code VARCHAR(20) PRIMARY KEY,
     role_name TEXT NOT NULL,
-    is_system BOOLEAN DEFAULT FALSE
+    is_system BOOLEAN DEFAULT FALSE,
+    
+    -- Audit Fields
+    created_by VARCHAR(50),
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
--- Bảng người dùng (Chủ trọ, Nhân viên, Khách thuê)
+-- Bảng quyền hạn chi tiết (Permissions)
+CREATE TABLE sy_permissions (
+    permission_code VARCHAR(50) PRIMARY KEY,
+    permission_name TEXT NOT NULL,
+    module VARCHAR(50),
+    
+    -- Audit Fields
+    created_by VARCHAR(50),
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
+);
+
+-- Bảng liên kết Role - Permission
+CREATE TABLE sy_role_permissions (
+    role_code VARCHAR(20) REFERENCES sy_roles(role_code),
+    permission_code VARCHAR(50) REFERENCES sy_permissions(permission_code),
+    PRIMARY KEY (role_code, permission_code)
+);
+
+-- Bảng người dùng
 CREATE TABLE sy_users (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -58,39 +110,55 @@ CREATE TABLE sy_users (
     avatar_id UUID,
     is_active BOOLEAN DEFAULT TRUE,
     last_login TIMESTAMP,
+    refresh_token TEXT,
+    refresh_token_expiry TIMESTAMP,
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
     updated_date TIMESTAMP,
-    data_row_version INT DEFAULT 1
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
--- Bảng cấu hình sinh mã tự động (VD: HD-2024-0001)
+-- Bảng cấu hình sinh mã tự động
 CREATE TABLE sy_document_settings (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    transaction_type VARCHAR(50) UNIQUE, -- VD: 'INVOICE', 'CONTRACT'
+    transaction_type VARCHAR(50) UNIQUE,
     prefix VARCHAR(10),
-    date_format VARCHAR(10),            -- VD: 'YYYYMM'
+    date_format VARCHAR(10),
     number_digits INT DEFAULT 4,
     current_number INT DEFAULT 0,
-    updated_date TIMESTAMP
+    
+    -- Audit Fields
+    updated_date TIMESTAMP,
+    version INT DEFAULT 1
 );
 
 -- -----------------------------------------------------------------------------
 -- 2. MASTER DATA TABLES (ms_)
 -- -----------------------------------------------------------------------------
 
--- Quản lý dãy trọ/chi nhánh (Dành cho chủ có nhiều nhà)
+-- Quản lý dãy trọ/chi nhánh
 CREATE TABLE ms_branches (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     branch_name TEXT NOT NULL,
     address TEXT,
     description TEXT,
     is_active BOOLEAN DEFAULT TRUE,
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
-    updated_date TIMESTAMP
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
 -- Quản lý phòng
@@ -100,44 +168,65 @@ CREATE TABLE ms_rooms (
     room_name VARCHAR(50) NOT NULL,
     price NUMERIC(15, 2) DEFAULT 0,
     max_occupants INT DEFAULT 1,
-    status_code VARCHAR(50),            -- Liên kết sy_commons (ROOM_STATUS)
+    status_code VARCHAR(50),
     description TEXT,
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
     updated_date TIMESTAMP,
-    data_row_version INT DEFAULT 1
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
 -- Quản lý người thuê
 CREATE TABLE ms_tenants (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id INT REFERENCES sy_users(id), -- Link nếu cho khách login
+    user_id INT REFERENCES sy_users(id),
     full_name TEXT NOT NULL,
-    identity_number VARCHAR(20),        -- CCCD
+    identity_number VARCHAR(20),
     phone VARCHAR(20),
     email VARCHAR(100),
     dob DATE,
     gender_code VARCHAR(20),
     hometown TEXT,
-    address_temporary TEXT,             -- Địa chỉ thường trú
-    is_representative BOOLEAN DEFAULT FALSE, -- Là người đại diện thuê
-    status_code VARCHAR(50),            -- ACTIVE, INACTIVE
+    address_temporary TEXT,
+    is_representative BOOLEAN DEFAULT FALSE,
+    status_code VARCHAR(50),
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
-    updated_date TIMESTAMP
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
--- Danh mục loại phí (Điện, Nước, Wifi, Rác...)
+-- Danh mục loại phí
 CREATE TABLE ms_fee_types (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     branch_id INT REFERENCES ms_branches(id),
     fee_name TEXT NOT NULL,
     unit_price NUMERIC(15, 2) NOT NULL,
-    calc_method VARCHAR(20),            -- FIXED (Cố định), UNIT (Theo số), PERSON (Theo người)
-    is_system BOOLEAN DEFAULT FALSE,    -- Loại phí mặc định hệ thống
-    is_active BOOLEAN DEFAULT TRUE
+    calc_method VARCHAR(20),
+    is_system BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    -- Audit Fields
+    created_by VARCHAR(50),
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
 -- -----------------------------------------------------------------------------
@@ -152,20 +241,26 @@ CREATE TABLE tr_contracts (
     start_date DATE NOT NULL,
     end_date DATE,
     deposit_amount NUMERIC(15, 2) DEFAULT 0,
-    actual_rent_price NUMERIC(15, 2) NOT NULL, -- Giá thuê thực tế lúc ký
-    status_code VARCHAR(20),            -- ACTIVE, EXPIRED, TERMINATED
+    actual_rent_price NUMERIC(15, 2) NOT NULL,
+    status_code VARCHAR(20),
     remark TEXT,
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
-    updated_date TIMESTAMP
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
--- Chi tiết khách thuê trong hợp đồng (1 phòng nhiều người)
+-- Chi tiết khách thuê trong hợp đồng
 CREATE TABLE tr_contract_details (
     contract_id INT REFERENCES tr_contracts(id),
     tenant_id INT REFERENCES ms_tenants(id),
-    is_main BOOLEAN DEFAULT FALSE,      -- Người chịu trách nhiệm chính
+    is_main BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (contract_id, tenant_id)
 );
 
@@ -178,8 +273,16 @@ CREATE TABLE tr_utility_readings (
     elec_index_new NUMERIC(10, 2),
     water_index_old NUMERIC(10, 2),
     water_index_new NUMERIC(10, 2),
+    
+    -- Audit Fields
     created_by VARCHAR(50),
-    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
 -- Hóa đơn tiền phòng hàng tháng
@@ -192,23 +295,34 @@ CREATE TABLE tr_invoices (
     billing_year INT NOT NULL,
     total_amount NUMERIC(15, 2) DEFAULT 0,
     paid_amount NUMERIC(15, 2) DEFAULT 0,
-    status_code VARCHAR(20),            -- UNPAID, PARTIAL, PAID, CANCELLED
+    status_code VARCHAR(20),
     due_date DATE,
+    
+    -- Audit Fields
     created_by VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
-    updated_date TIMESTAMP
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
--- Chi tiết hóa đơn (Tiền phòng, tiền điện, nước, dịch vụ...)
+-- Chi tiết hóa đơn
 CREATE TABLE tr_invoice_items (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     invoice_id INT REFERENCES tr_invoices(id) ON DELETE CASCADE,
     fee_type_id INT REFERENCES ms_fee_types(id),
-    description TEXT,                   -- VD: Tiền điện (100 -> 150 kWh)
+    description TEXT,
     quantity NUMERIC(10, 2) DEFAULT 1,
     unit_price NUMERIC(15, 2) DEFAULT 0,
-    amount NUMERIC(15, 2) NOT NULL
+    amount NUMERIC(15, 2) NOT NULL,
+    
+    -- Audit Fields
+    created_by VARCHAR(50),
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    version INT DEFAULT 1
 );
 
 -- Lịch sử thanh toán
@@ -217,86 +331,51 @@ CREATE TABLE tr_payments (
     invoice_id INT REFERENCES tr_invoices(id),
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     amount NUMERIC(15, 2) NOT NULL,
-    method_code VARCHAR(20),            -- CASH, BANK_TRANSFER
-    evidence_id UUID,                   -- Link tới ảnh bill chuyển khoản trong sy_file_attachments
+    method_code VARCHAR(20),
+    evidence_id UUID,
     remark TEXT,
-    created_by VARCHAR(50)
-);
-
--- Quản lý sự cố/Sửa chữa
-CREATE TABLE tr_incidents (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    room_id INT REFERENCES ms_rooms(id),
-    tenant_id INT REFERENCES ms_tenants(id),
-    description TEXT NOT NULL,
-    priority_code VARCHAR(20),          -- LOW, MEDIUM, HIGH
-    status_code VARCHAR(20),            -- NEW, PROCESSING, FIXED, CANCELLED
-    reported_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    resolved_date TIMESTAMP,
-    repair_cost NUMERIC(15, 2) DEFAULT 0,
-    created_by VARCHAR(50)
+    
+    -- Audit Fields
+    created_by VARCHAR(50),
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_date TIMESTAMP,
+    deleted_by VARCHAR(50),
+    deleted_date TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 1
 );
 
 -- -----------------------------------------------------------------------------
--- 4. INDEXES FOR PERFORMANCE
--- -----------------------------------------------------------------------------
-CREATE INDEX idx_room_branch ON ms_rooms(branch_id);
-CREATE INDEX idx_invoice_contract ON tr_invoices(contract_id);
-CREATE INDEX idx_common_type ON sy_commons(type);
-
--- -----------------------------------------------------------------------------
--- 5. SEED DATA
+-- 4. PERFORMANCE & INTEGRITY
 -- -----------------------------------------------------------------------------
 
--- 5.1 Cấu hình Common dữ liệu lõi
+-- Indexes
+CREATE INDEX idx_sy_users_username ON sy_users(username);
+CREATE INDEX idx_ms_rooms_branch_status ON ms_rooms(branch_id, status_code);
+CREATE INDEX idx_tr_contracts_room_status ON tr_contracts(room_id, status_code);
+CREATE INDEX idx_tr_invoices_month_year ON tr_invoices(billing_month, billing_year);
+CREATE INDEX idx_tr_invoices_status ON tr_invoices(status_code);
+
+-- -----------------------------------------------------------------------------
+-- 5. INITIAL SEED DATA (ENTERPRISE)
+-- -----------------------------------------------------------------------------
+
+INSERT INTO sy_roles (role_code, role_name, is_system) VALUES 
+('SUPER_ADMIN', 'Quản trị tối cao', true),
+('ADMIN', 'Chủ trọ / Quản trị viên', true),
+('MANAGER', 'Quản lý dãy trọ', true),
+('TENANT', 'Khách thuê', true);
+
 INSERT INTO sy_commons (type, code, name_vi, name_en, sort_order) VALUES
 ('ROOM_STATUS', 'EMPTY', 'Trống', 'Empty', 1),
 ('ROOM_STATUS', 'RENTED', 'Đang thuê', 'Rented', 2),
 ('ROOM_STATUS', 'REPAIR', 'Đang sửa chữa', 'Maintenance', 3),
-
 ('GENDER', 'MALE', 'Nam', 'Male', 1),
 ('GENDER', 'FEMALE', 'Nữ', 'Female', 2),
-('GENDER', 'OTHER', 'Khác', 'Other', 3),
-
-('FEE_CALC', 'FIXED', 'Cố định', 'Fixed', 1),
-('FEE_CALC', 'UNIT', 'Theo chỉ số', 'Per Unit', 2),
-('FEE_CALC', 'PERSON', 'Theo số người', 'Per Person', 3),
-
 ('INV_STATUS', 'UNPAID', 'Chưa thanh toán', 'Unpaid', 1),
-('INV_STATUS', 'PAID', 'Đã thanh toán', 'Paid', 2),
-('INV_STATUS', 'PARTIAL', 'Thanh toán một phần', 'Partial', 3);
+('INV_STATUS', 'PAID', 'Đã thanh toán', 'Paid', 2);
 
--- 5.2 Tạo vai trò hệ thống
-INSERT INTO sy_roles (role_code, role_name, is_system) VALUES
-('ADMIN', 'Chủ trọ (Admin)', true),
-('MANAGER', 'Quản lý dãy trọ', true),
-('TENANT', 'Khách thuê', true);
-
--- 5.3 Tạo tài khoản mẫu (Password: 123456 - thực tế sẽ dùng hash)
-INSERT INTO sy_users (username, password_hash, full_name, role_code) VALUES
-('admin', '$2b$12$KIXpZ2m5U9W5.Vl5v3e1Uu8l0aZ8.v0w5U.5V.5V.5V.5V.5V.5V', 'Nguyễn Văn Chủ Trọ', 'ADMIN'),
-('khach01', '$2b$12$KIXpZ2m5U9W5.Vl5v3e1Uu8l0aZ8.v0w5U.5V.5V.5V.5V.5V.5V', 'Lê Văn Thuê', 'TENANT');
-
--- 5.4 Tạo chi nhánh & phòng mẫu
-INSERT INTO ms_branches (branch_name, address) VALUES 
-('Nhà Trọ Bình Dương', '123 Thủ Dầu Một, Bình Dương');
-
-INSERT INTO ms_rooms (branch_id, room_name, price, max_occupants, status_code) VALUES
-(1, 'Phòng 101', 2500000, 2, 'EMPTY'),
-(1, 'Phòng 102', 2500000, 2, 'RENTED');
-
--- 5.5 Tạo phí mẫu
-INSERT INTO ms_fee_types (branch_id, fee_name, unit_price, calc_method, is_system) VALUES
-(1, 'Tiền phòng', 0, 'FIXED', true),
-(1, 'Tiền điện', 3500, 'UNIT', true),
-(1, 'Tiền nước', 15000, 'UNIT', true),
-(1, 'Rác & Vệ sinh', 50000, 'FIXED', true);
-
--- 5.6 Tạo người thuê & Hợp đồng mẫu
-INSERT INTO ms_tenants (user_id, full_name, identity_number, phone, status_code) VALUES
-(2, 'Lê Văn Thuê', '0123456789', '0909123456', 'ACTIVE');
-
-INSERT INTO tr_contracts (contract_code, room_id, start_date, deposit_amount, actual_rent_price, status_code) VALUES
-('HD-2024-0001', 2, '2024-01-01', 2500000, 2500000, 'ACTIVE');
-
-INSERT INTO tr_contract_details (contract_id, tenant_id, is_main) VALUES (1, 1, true);
+-- Default admin user (pass: admin123 - hash needed in app)
+INSERT INTO sy_users (username, password_hash, full_name, role_code) VALUES 
+('admin', '$2b$12$KIXpZ2m5U9W5.Vl5v3e1Uu8l0aZ8.v0w5U.5V.5V.5V.5V.5V.5V', 'Hệ Thống Admin', 'SUPER_ADMIN');

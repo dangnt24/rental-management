@@ -1,0 +1,8 @@
+{
+  "Success": "Thành công",
+  "Error": "Lỗi",
+  "NotFound": "Không tìm thấy dữ liệu",
+  "Unauthorized": "Không có quyền truy cập",
+  "LoginFailed": "Đăng nhập thất bại",
+  "ValidationError": "Dữ liệu không hợp lệ"
+}
