@@ -1,0 +1,87 @@
+@model Rental.Core.PagedResult<Rental.Application.DTOs.PaymentDto>
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Lịch sử thanh toán</h1>
+    <button onclick="openProcessModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Ghi nhận thanh toán</button>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Mã hóa đơn</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Số tiền</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Ngày thanh toán</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Phương thức</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            @foreach (var p in Model.Items)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-mono text-sm">@p.InvoiceCode</td>
+                    <td class="px-4 py-3 text-right font-medium">@p.Amount.ToString("N0") đ</td>
+                    <td class="px-4 py-3 text-center">@p.PaymentDate.ToString("dd/MM/yyyy")</td>
+                    <td class="px-4 py-3 text-center">@p.MethodCode</td>
+                    <td class="px-4 py-3">@p.Remark</td>
+                </tr>
+            }
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Chưa có giao dịch thanh toán</td></tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
+            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
+            <div class="flex gap-2">
+                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
+                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Process Payment Modal -->
+<div id="processModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6">
+        <h2 class="text-lg font-bold mb-4">Ghi nhận thanh toán</h2>
+        <form asp-action="Process" method="post">
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Mã hóa đơn (ID)</label>
+                <input name="InvoiceId" type="number" class="w-full border rounded-md px-3 py-2" required placeholder="Nhập ID hóa đơn" />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Số tiền</label>
+                <input name="Amount" type="number" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Phương thức</label>
+                <select name="MethodCode" class="w-full border rounded-md px-3 py-2">
+                    <option value="CASH">Tiền mặt</option>
+                    <option value="TRANSFER">Chuyển khoản</option>
+                    <option value="MOMO">Ví MoMo</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Ghi chú</label>
+                <input name="Remark" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeProcessModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Xác nhận</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openProcessModal() { document.getElementById('processModal').classList.remove('hidden'); document.getElementById('processModal').classList.add('flex'); }
+    function closeProcessModal() { document.getElementById('processModal').classList.add('hidden'); document.getElementById('processModal').classList.remove('flex'); }
+</script>

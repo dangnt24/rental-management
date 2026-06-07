@@ -1,0 +1,38 @@
+@model Rental.Application.DTOs.LoginRequest
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Đăng nhập - Rental System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-96 border border-gray-200">
+        <h1 class="text-2xl font-bold mb-6 text-center text-slate-800">Rental System</h1>
+        
+        @if (ViewBag.Error != null)
+        {
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form action="/Account/Login" method="post">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Tên đăng nhập</label>
+                <input type="text" name="Username" class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Mật khẩu</label>
+                <input type="password" name="Password" class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-bold hover:bg-blue-700 transition">
+                ĐĂNG NHẬP
+            </button>
+        </form>
+    </div>
+</body>
+</html>

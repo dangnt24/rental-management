@@ -1,21 +1,44 @@
-# .NET
+## [Visual Studio]
+.vs/
 [Bb]in/
 [Oo]bj/
 *.user
 *.userosscache
 *.sln.docstates
-
-# Visual Studio
 .vs/
-.vscode/
 
-# Node
+## [NuGet]
+packages/
+*.nupkg
+# Visual Studio 2015 individual package restore
+*.vssscc
+
+## [Node / Frontend]
 node_modules/
 dist/
 dist-ssr/
 *.local
 .eslintcache
+.stylelintcache
+.prettiercache
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# OS
+## [Environment Files]
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+## [OS Specific]
 .DS_Store
 Thumbs.db
+
+## [Docker]
+.docker/
+
+## [Logs]
+logs/
+*.log

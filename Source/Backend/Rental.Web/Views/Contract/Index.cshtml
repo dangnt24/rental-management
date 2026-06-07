@@ -1,0 +1,66 @@
+@model Rental.Core.PagedResult<Rental.Application.DTOs.ContractDto>
+@{
+    ViewData["Title"] = "Hợp đồng";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Hợp đồng thuê phòng</h1>
+    <a href="/Contract/Create" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Tạo hợp đồng</a>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Mã HĐ</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Phòng</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Ngày bắt đầu</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Ngày kết thúc</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Giá thuê</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Trạng thái</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            @foreach (var c in Model.Items)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-mono text-sm">@c.ContractCode</td>
+                    <td class="px-4 py-3">@c.RoomName</td>
+                    <td class="px-4 py-3">@c.StartDate.ToString("dd/MM/yyyy")</td>
+                    <td class="px-4 py-3">@(c.EndDate?.ToString("dd/MM/yyyy") ?? "--")</td>
+                    <td class="px-4 py-3 text-right">@c.ActualRentPrice.ToString("N0") đ</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full @(c.StatusCode == "ACTIVE" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
+                            @(c.StatusCode == "ACTIVE" ? "Hiệu lực" : "Đã kết thúc")
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="/Contract/Details/@c.Id" class="text-blue-600 hover:text-blue-800 text-sm mr-2">Chi tiết</a>
+                        @if (c.StatusCode == "ACTIVE")
+                        {
+                            <form asp-action="Terminate" method="post" class="inline" onsubmit="return confirm('Kết thúc hợp đồng này?')">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Kết thúc</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Chưa có hợp đồng</td></tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
+            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
+            <div class="flex gap-2">
+                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
+                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
+            </div>
+        </div>
+    }
+</div>

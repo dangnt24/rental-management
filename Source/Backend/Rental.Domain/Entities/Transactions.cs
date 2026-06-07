@@ -23,9 +23,6 @@ namespace Rental.Domain.Entities
         public virtual ICollection<Invoice> Invoices { get; set; }
     }
 
-    /// <summary>
-    /// Chi tiết người thuê trong hợp đồng.
-    /// </summary>
     public class ContractDetail
     {
         public int ContractId { get; set; }
@@ -36,9 +33,6 @@ namespace Rental.Domain.Entities
         public virtual Tenant Tenant { get; set; }
     }
 
-    /// <summary>
-    /// Thực thể Hóa đơn hàng tháng.
-    /// </summary>
     public class Invoice : BaseEntity
     {
         public string InvoiceCode { get; set; }
@@ -56,25 +50,19 @@ namespace Rental.Domain.Entities
         public virtual ICollection<Payment> Payments { get; set; }
     }
 
-    /// <summary>
-    /// Chi tiết các khoản phí trong hóa đơn.
-    /// </summary>
     public class InvoiceItem : BaseEntity
     {
         public int InvoiceId { get; set; }
-        public int FeeTypeId { get; set; }
+        public int? FeeTypeId { get; set; }
         public string Description { get; set; }
         public decimal Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Amount { get; set; }
 
         public virtual Invoice Invoice { get; set; }
-        public virtual FeeType FeeType { get; set; }
+        public virtual FeeType? FeeType { get; set; }
     }
 
-    /// <summary>
-    /// Thực thể Loại phí.
-    /// </summary>
     public class FeeType : BaseEntity
     {
         public int? BranchId { get; set; }
@@ -83,22 +71,50 @@ namespace Rental.Domain.Entities
         public string CalcMethod { get; set; }
         public bool IsSystem { get; set; }
         public bool IsActive { get; set; } = true;
-
-        public virtual Branch Branch { get; set; }
     }
 
-    /// <summary>
-    /// Lịch sử thanh toán.
-    /// </summary>
     public class Payment : BaseEntity
     {
         public int InvoiceId { get; set; }
-        public DateTime PaymentDate { get; set; } = DateTime.Now;
+        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
         public decimal Amount { get; set; }
         public string MethodCode { get; set; }
         public Guid? EvidenceId { get; set; }
         public string Remark { get; set; }
 
         public virtual Invoice Invoice { get; set; }
+    }
+
+    /// <summary>
+    /// Thực thể Chốt chỉ số điện nước.
+    /// </summary>
+    public class UtilityReading : BaseEntity
+    {
+        public int RoomId { get; set; }
+        public DateTime ReadingDate { get; set; }
+        public decimal ElecIndexOld { get; set; }
+        public decimal ElecIndexNew { get; set; }
+        public decimal WaterIndexOld { get; set; }
+        public decimal WaterIndexNew { get; set; }
+
+        public virtual Room Room { get; set; }
+    }
+
+    /// <summary>
+    /// Thực thể Quản lý sự cố.
+    /// </summary>
+    public class Incident : BaseEntity
+    {
+        public int RoomId { get; set; }
+        public int TenantId { get; set; }
+        public string Description { get; set; }
+        public string PriorityCode { get; set; }
+        public string StatusCode { get; set; }
+        public decimal RepairCost { get; set; }
+        public DateTime ReportedDate { get; set; }
+        public DateTime? ResolvedDate { get; set; }
+
+        public virtual Room Room { get; set; }
+        public virtual Tenant Tenant { get; set; }
     }
 }

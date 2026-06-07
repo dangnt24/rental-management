@@ -1,0 +1,137 @@
+@model Rental.Core.PagedResult<Rental.Application.DTOs.TenantDto>
+@{
+    ViewData["Title"] = "Người thuê";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Người thuê</h1>
+    <button onclick="openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Thêm người thuê</button>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Họ tên</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">SĐT</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">CMND/CCCD</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Trạng thái</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            @foreach (var t in Model.Items)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium">@t.FullName</td>
+                    <td class="px-4 py-3">@t.Phone</td>
+                    <td class="px-4 py-3">@t.IdentityNumber</td>
+                    <td class="px-4 py-3">@t.Email</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded-full @(t.StatusCode == "ACTIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700")">@t.StatusCode</span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="openEditModal(@t.Id, '@t.FullName', '@t.Phone', '@t.IdentityNumber', '@t.Email')" class="text-blue-600 hover:text-blue-800 text-sm mr-2">Sửa</button>
+                        <form asp-action="Delete" method="post" class="inline" onsubmit="return confirm('Xóa người thuê này?')">
+                            <input type="hidden" name="id" value="@t.Id" />
+                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Chưa có người thuê</td></tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
+            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
+            <div class="flex gap-2">
+                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
+                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Create Modal -->
+<div id="createModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-bold mb-4">Thêm người thuê</h2>
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Họ tên</label>
+                <input name="FullName" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Số điện thoại</label>
+                <input name="Phone" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">CMND/CCCD</label>
+                <input name="IdentityNumber" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Email</label>
+                <input name="Email" type="email" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Địa chỉ tạm trú</label>
+                <input name="AddressTemporary" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-bold mb-4">Sửa người thuê</h2>
+        <form asp-action="Edit" method="post">
+            <input type="hidden" name="Id" id="editId" />
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Họ tên</label>
+                <input name="FullName" id="editFullName" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Số điện thoại</label>
+                <input name="Phone" id="editPhone" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">CMND/CCCD</label>
+                <input name="IdentityNumber" id="editIdentityNumber" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Email</label>
+                <input name="Email" id="editEmail" type="email" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() { document.getElementById('createModal').classList.remove('hidden'); document.getElementById('createModal').classList.add('flex'); }
+    function closeCreateModal() { document.getElementById('createModal').classList.add('hidden'); document.getElementById('createModal').classList.remove('flex'); }
+    function openEditModal(id, name, phone, identity, email) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editFullName').value = name;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editIdentityNumber').value = identity;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.getElementById('editModal').classList.add('flex');
+    }
+    function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); document.getElementById('editModal').classList.remove('flex'); }
+</script>

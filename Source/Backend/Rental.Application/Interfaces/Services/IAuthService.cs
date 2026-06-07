@@ -32,6 +32,9 @@ namespace Rental.Application.Interfaces.Services
     public interface IUserService
     {
         Task<ApiResult<UserDto>> GetByIdAsync(int id);
-        Task<ApiResult<PagedResult<UserDto>>> GetPagedListAsync(int pageNumber, int pageSize, string searchTerm);
+        Task<ApiResult<PagedResult<UserDto>>> GetPagedListAsync(int pageNumber, int pageSize, string? searchTerm);
+        Task<ApiResult<UserDto>> CreateAsync(UserDto dto);
+        Task<ApiResult<UserDto>> UpdateAsync(UserDto dto);
+        Task<ApiResult<bool>> DeleteAsync(int id);
     }
 }

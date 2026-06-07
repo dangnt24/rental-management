@@ -21,7 +21,7 @@ namespace Rental.Core
         /// <summary>
         /// Thời điểm tạo bản ghi.
         /// </summary>
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// Người cập nhật cuối cùng.
@@ -36,7 +36,7 @@ namespace Rental.Core
         /// <summary>
         /// Người thực hiện xóa (Soft Delete).
         /// </summary>
-        public string DeletedBy { get; set; }
+        public string? DeletedBy { get; set; }
 
         /// <summary>
         /// Thời điểm thực hiện xóa (Soft Delete).
@@ -44,7 +44,7 @@ namespace Rental.Core
         public DateTime? DeletedDate { get; set; }
 
         /// <summary>
-        /// Đánh dấu bản ghi đã bị xóa hay chưa.
+        /// Đánh dấu bản ghi đã bị xóa hay chưa (Soft Delete).
         /// </summary>
         public bool IsDeleted { get; set; } = false;
 
@@ -65,10 +65,10 @@ namespace Rental.Core
         public Guid Id { get; set; } = Guid.NewGuid();
 
         public string CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public string UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public string DeletedBy { get; set; }
+        public string? DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
         public bool IsDeleted { get; set; } = false;
         public int Version { get; set; } = 1;

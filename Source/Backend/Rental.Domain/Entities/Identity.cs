@@ -1,6 +1,8 @@
 using Rental.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rental.Domain.Entities
 {
@@ -9,79 +11,47 @@ namespace Rental.Domain.Entities
     /// </summary>
     public class User : BaseEntity
     {
-        /// <summary>
-        /// Tên đăng nhập.
-        /// </summary>
         public string Username { get; set; }
-
-        /// <summary>
-        /// Mật khẩu đã mã hóa.
-        /// </summary>
         public string PasswordHash { get; set; }
-
-        /// <summary>
-        /// Họ và tên đầy đủ.
-        /// </summary>
         public string FullName { get; set; }
-
-        /// <summary>
-        /// Địa chỉ Email.
-        /// </summary>
         public string Email { get; set; }
-
-        /// <summary>
-        /// Số điện thoại.
-        /// </summary>
         public string Phone { get; set; }
-
+        
         /// <summary>
-        /// Mã vai trò (Role Code).
+        /// Khóa ngoại liên kết với bảng Vai trò.
         /// </summary>
         public string RoleCode { get; set; }
 
-        /// <summary>
-        /// Trạng thái hoạt động.
-        /// </summary>
         public bool IsActive { get; set; } = true;
-
-        /// <summary>
-        /// Thời điểm đăng nhập cuối cùng.
-        /// </summary>
         public DateTime? LastLogin { get; set; }
-
-        /// <summary>
-        /// Token để làm mới Access Token.
-        /// </summary>
-        public string RefreshToken { get; set; }
-
-        /// <summary>
-        /// Thời hạn của Refresh Token.
-        /// </summary>
+        public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
 
         // Navigation properties
+        [ForeignKey("RoleCode")]
         public virtual Role Role { get; set; }
     }
 
     /// <summary>
     /// Thực thể Vai trò.
+    /// Sử dụng RoleCode làm khóa chính.
     /// </summary>
-    public class Role : BaseEntity
+    public class Role
     {
-        /// <summary>
-        /// Mã vai trò.
-        /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string RoleCode { get; set; }
-
-        /// <summary>
-        /// Tên vai trò.
-        /// </summary>
         public string RoleName { get; set; }
-
-        /// <summary>
-        /// Đánh dấu là vai trò mặc định của hệ thống.
-        /// </summary>
         public bool IsSystem { get; set; }
+
+        public string? CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public string? UpdatedBy { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+        public string? DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
+        public bool IsDeleted { get; set; } = false;
+        public int Version { get; set; } = 1;
 
         public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<RolePermission> RolePermissions { get; set; }
@@ -90,21 +60,12 @@ namespace Rental.Domain.Entities
     /// <summary>
     /// Thực thể Quyền hạn.
     /// </summary>
-    public class Permission : BaseEntity
+    public class Permission
     {
-        /// <summary>
-        /// Mã quyền.
-        /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string PermissionCode { get; set; }
-
-        /// <summary>
-        /// Tên quyền.
-        /// </summary>
         public string PermissionName { get; set; }
-
-        /// <summary>
-        /// Module thuộc về.
-        /// </summary>
         public string Module { get; set; }
 
         public virtual ICollection<RolePermission> RolePermissions { get; set; }
@@ -118,7 +79,10 @@ namespace Rental.Domain.Entities
         public string RoleCode { get; set; }
         public string PermissionCode { get; set; }
 
+        [ForeignKey("RoleCode")]
         public virtual Role Role { get; set; }
+        
+        [ForeignKey("PermissionCode")]
         public virtual Permission Permission { get; set; }
     }
 }

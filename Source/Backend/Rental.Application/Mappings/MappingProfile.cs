@@ -12,10 +12,16 @@ namespace Rental.Application.Mappings
         public MappingProfile()
         {
             CreateMap<User, UserDto>().ReverseMap();
-            
-            // Thêm các ánh xạ khác tại đây
-            // CreateMap<Branch, BranchDto>().ReverseMap();
-            // CreateMap<Room, RoomDto>().ReverseMap();
+            CreateMap<Room, RoomDto>().ReverseMap();
+            CreateMap<Tenant, TenantDto>().ReverseMap();
+            CreateMap<Branch, BranchDto>().ReverseMap();
+            CreateMap<Contract, ContractDto>().ReverseMap();
+            CreateMap<UtilityReading, UtilityReadingDto>().ReverseMap();
+            CreateMap<Invoice, InvoiceDto>().ReverseMap();
+            CreateMap<InvoiceItem, InvoiceItemDto>().ReverseMap();
+            CreateMap<Payment, PaymentDto>().ReverseMap();
+            CreateMap<Incident, IncidentDto>().ReverseMap();
+            CreateMap<FeeType, FeeTypeDto>().ReverseMap();
         }
     }
 }

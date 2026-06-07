@@ -1,26 +1,11 @@
+using Rental.Application.Interfaces.Persistence;
+using Rental.Domain.Entities;
+using Rental.Persistence.Repositories;
 using System;
 using System.Threading.Tasks;
-using Rental.Persistence.Repositories;
-using Rental.Domain.Entities;
 
 namespace Rental.Persistence.UnitOfWork
 {
-    /// <summary>
-    /// Giao diện Unit Of Work để quản lý giao dịch và repositories.
-    /// </summary>
-    public interface IUnitOfWork : IDisposable
-    {
-        IGenericRepository<User> Users { get; }
-        IGenericRepository<Role> Roles { get; }
-        IGenericRepository<Branch> Branches { get; }
-        IGenericRepository<Room> Rooms { get; }
-        IGenericRepository<Tenant> Tenants { get; }
-        IGenericRepository<Contract> Contracts { get; }
-        IGenericRepository<Invoice> Invoices { get; }
-        
-        Task<int> CompleteAsync();
-    }
-
     /// <summary>
     /// Triển khai Unit Of Work.
     /// </summary>
@@ -38,6 +23,10 @@ namespace Rental.Persistence.UnitOfWork
             Tenants = new GenericRepository<Tenant>(_context);
             Contracts = new GenericRepository<Contract>(_context);
             Invoices = new GenericRepository<Invoice>(_context);
+            UtilityReadings = new GenericRepository<UtilityReading>(_context);
+            Payments = new GenericRepository<Payment>(_context);
+            Incidents = new GenericRepository<Incident>(_context);
+            FeeTypes = new GenericRepository<FeeType>(_context);
         }
 
         public IGenericRepository<User> Users { get; private set; }
@@ -47,6 +36,10 @@ namespace Rental.Persistence.UnitOfWork
         public IGenericRepository<Tenant> Tenants { get; private set; }
         public IGenericRepository<Contract> Contracts { get; private set; }
         public IGenericRepository<Invoice> Invoices { get; private set; }
+        public IGenericRepository<UtilityReading> UtilityReadings { get; private set; }
+        public IGenericRepository<Payment> Payments { get; private set; }
+        public IGenericRepository<Incident> Incidents { get; private set; }
+        public IGenericRepository<FeeType> FeeTypes { get; private set; }
 
         public async Task<int> CompleteAsync()
         {

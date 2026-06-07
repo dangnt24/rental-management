@@ -1,0 +1,29 @@
+@model Rental.Application.DTOs.ContractDto
+@{
+    ViewData["Title"] = "Chi tiết hợp đồng";
+}
+
+<div class="mb-6">
+    <a href="/Contract" class="text-blue-600 hover:text-blue-800 text-sm">&larr; Quay lại danh sách</a>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-2xl">
+    <div class="flex justify-between items-start mb-6">
+        <h1 class="text-xl font-bold">Hợp đồng @Model.ContractCode</h1>
+        <span class="px-3 py-1 text-sm rounded-full @(Model.StatusCode == "ACTIVE" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
+            @(Model.StatusCode == "ACTIVE" ? "Hiệu lực" : "Đã kết thúc")
+        </span>
+    </div>
+    <dl class="grid grid-cols-2 gap-4">
+        <div><dt class="text-sm text-gray-500">Phòng</dt><dd class="font-medium">@Model.RoomName</dd></div>
+        <div><dt class="text-sm text-gray-500">Giá thuê thực tế</dt><dd class="font-medium">@Model.ActualRentPrice.ToString("N0") đ</dd></div>
+        <div><dt class="text-sm text-gray-500">Tiền cọc</dt><dd class="font-medium">@Model.DepositAmount.ToString("N0") đ</dd></div>
+        <div><dt class="text-sm text-gray-500">Ngày bắt đầu</dt><dd class="font-medium">@Model.StartDate.ToString("dd/MM/yyyy")</dd></div>
+        <div><dt class="text-sm text-gray-500">Ngày kết thúc</dt><dd class="font-medium">@(Model.EndDate?.ToString("dd/MM/yyyy") ?? "--")</dd></div>
+        <div><dt class="text-sm text-gray-500">Ngày tạo</dt><dd class="font-medium">@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
+    </dl>
+    @if (!string.IsNullOrEmpty(Model.Remark))
+    {
+        <div class="mt-4"><dt class="text-sm text-gray-500">Ghi chú</dt><dd class="mt-1">@Model.Remark</dd></div>
+    }
+</div>

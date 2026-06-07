@@ -1,9 +1,9 @@
 using AutoMapper;
 using Rental.Application.DTOs;
+using Rental.Application.Interfaces.Persistence;
 using Rental.Application.Interfaces.Services;
 using Rental.Core;
 using Rental.Domain.Entities;
-using Rental.Persistence.UnitOfWork;
 using Rental.Security.Jwt;
 using Rental.Security.Password;
 using System;
@@ -56,8 +56,8 @@ namespace Rental.Application.Services
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
-            user.LastLogin = DateTime.Now;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            user.LastLogin = DateTime.UtcNow;
 
             _unitOfWork.Users.Update(user);
             await _unitOfWork.CompleteAsync();
@@ -73,7 +73,7 @@ namespace Rental.Application.Services
         public async Task<ApiResult<LoginResponse>> RefreshTokenAsync(string refreshToken)
         {
             var user = _unitOfWork.Users.Find(u => u.RefreshToken == refreshToken).FirstOrDefault();
-            if (user == null || user.RefreshTokenExpiry < DateTime.Now)
+            if (user == null || user.RefreshTokenExpiry < DateTime.UtcNow)
             {
                 return ApiResult<LoginResponse>.Failure("Refresh Token không hợp lệ hoặc đã hết hạn", null, 401);
             }

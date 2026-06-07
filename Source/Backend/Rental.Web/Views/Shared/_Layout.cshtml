@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rental Management - @ViewData["Title"]</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-slate-800 text-white flex flex-col">
+            <div class="p-6 text-xl font-bold border-b border-slate-700">Rental Manager</div>
+            <nav class="flex-1 mt-4 overflow-y-auto">
+                <a href="/" class="block px-6 py-3 hover:bg-slate-700 transition">Tổng quan</a>
+                <a href="/Room" class="block px-6 py-3 hover:bg-slate-700 transition">Quản lý phòng</a>
+                <a href="/Tenant" class="block px-6 py-3 hover:bg-slate-700 transition">Người thuê</a>
+                <a href="/Contract" class="block px-6 py-3 hover:bg-slate-700 transition">Hợp đồng</a>
+                <a href="/Billing" class="block px-6 py-3 hover:bg-slate-700 transition">Hóa đơn</a>
+                <a href="/Payment" class="block px-6 py-3 hover:bg-slate-700 transition">Thanh toán</a>
+                <a href="/Incident" class="block px-6 py-3 hover:bg-slate-700 transition">Sự cố</a>
+            </nav>
+            <div class="p-4 border-t border-slate-700">
+                <a href="/Account/Logout" class="text-red-400 hover:text-red-300 text-sm">Đăng xuất</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8 overflow-auto">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+</html>

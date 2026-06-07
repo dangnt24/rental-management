@@ -1,0 +1,122 @@
+@model Rental.Core.PagedResult<Rental.Application.DTOs.IncidentDto>
+@{
+    ViewData["Title"] = "Sự cố";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Quản lý sự cố</h1>
+    <button onclick="openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Báo sự cố</button>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Phòng</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Mô tả</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Mức độ</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Trạng thái</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Ngày báo</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Chi phí</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            @foreach (var inc in Model.Items)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium">@inc.RoomName</td>
+                    <td class="px-4 py-3 max-w-xs truncate">@inc.Description</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full @(inc.PriorityCode == "HIGH" ? "bg-red-100 text-red-700" : inc.PriorityCode == "MEDIUM" ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700")">
+                            @(inc.PriorityCode == "HIGH" ? "Cao" : inc.PriorityCode == "MEDIUM" ? "Trung bình" : "Thấp")
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full @(inc.StatusCode == "RESOLVED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700")">
+                            @(inc.StatusCode == "RESOLVED" ? "Đã xử lý" : "Đang chờ")
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-center">@inc.ReportedDate.ToString("dd/MM/yyyy")</td>
+                    <td class="px-4 py-3 text-right">@inc.RepairCost.ToString("N0") đ</td>
+                    <td class="px-4 py-3 text-right">
+                        @if (inc.StatusCode != "RESOLVED")
+                        {
+                            <form asp-action="Update" method="post" class="inline">
+                                <input type="hidden" name="Id" value="@inc.Id" />
+                                <input type="hidden" name="RoomId" value="@inc.RoomId" />
+                                <input type="hidden" name="TenantId" value="@inc.TenantId" />
+                                <input type="hidden" name="Description" value="@inc.Description" />
+                                <input type="hidden" name="PriorityCode" value="@inc.PriorityCode" />
+                                <input type="hidden" name="StatusCode" value="RESOLVED" />
+                                <input type="hidden" name="RepairCost" value="@inc.RepairCost" />
+                                <input type="hidden" name="ReportedDate" value="@inc.ReportedDate.ToString("o")" />
+                                <button type="submit" class="text-green-600 hover:text-green-800 text-sm mr-2">Xác nhận xử lý</button>
+                            </form>
+                        }
+                        <form asp-action="Delete" method="post" class="inline" onsubmit="return confirm('Xóa sự cố này?')">
+                            <input type="hidden" name="id" value="@inc.Id" />
+                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Chưa có sự cố nào</td></tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
+            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
+            <div class="flex gap-2">
+                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
+                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Create Modal -->
+<div id="createModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+        <h2 class="text-lg font-bold mb-4">Báo sự cố mới</h2>
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">ID Phòng</label>
+                <input name="RoomId" type="number" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">ID Người thuê</label>
+                <input name="TenantId" type="number" class="w-full border rounded-md px-3 py-2" required />
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Mô tả</label>
+                <textarea name="Description" class="w-full border rounded-md px-3 py-2" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Mức độ ưu tiên</label>
+                <select name="PriorityCode" class="w-full border rounded-md px-3 py-2">
+                    <option value="LOW">Thấp</option>
+                    <option value="MEDIUM" selected>Trung bình</option>
+                    <option value="HIGH">Cao</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Chi phí sửa chữa</label>
+                <input name="RepairCost" type="number" class="w-full border rounded-md px-3 py-2" value="0" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Báo cáo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() { document.getElementById('createModal').classList.remove('hidden'); document.getElementById('createModal').classList.add('flex'); }
+    function closeCreateModal() { document.getElementById('createModal').classList.add('hidden'); document.getElementById('createModal').classList.remove('flex'); }
+</script>

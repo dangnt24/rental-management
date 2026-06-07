@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Rental.Application.Interfaces.Persistence;
 using Rental.Application.Interfaces.Services;
 using Rental.Application.Mappings;
 using Rental.Application.Services;
+using Rental.Mail;
 using Rental.Persistence;
 using Rental.Persistence.UnitOfWork;
 using Rental.Security.Jwt;
@@ -16,7 +18,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RentalDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Cấu hình JWT Authentication
+// 2. Cấu hình CORS cho phép frontend React gọi API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+// 3. Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -37,6 +51,19 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IIncidentService, IncidentService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<IFeeTypeService, FeeTypeService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // 4. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -56,6 +83,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

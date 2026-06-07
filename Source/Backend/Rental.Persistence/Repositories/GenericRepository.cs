@@ -1,3 +1,4 @@
+using Rental.Application.Interfaces.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,19 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Rental.Persistence.Repositories
 {
-    /// <summary>
-    /// Giao diện Repository tổng quát.
-    /// </summary>
-    public interface IGenericRepository<T> where T : class
-    {
-        Task<T> GetByIdAsync(int id);
-        Task<IEnumerable<T>> GetAllAsync();
-        IQueryable<T> Find(Expression<Func<T, bool>> expression);
-        Task AddAsync(T entity);
-        void Update(T entity);
-        void Remove(T entity);
-    }
-
     /// <summary>
     /// Triển khai Repository tổng quát.
     /// </summary>

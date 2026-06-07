@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Source\\Backend\\Rental.Api\\Rental.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Source\\Backend\\Rental.Web\\Rental.Web.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

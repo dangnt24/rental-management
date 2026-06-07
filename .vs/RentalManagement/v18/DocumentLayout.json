@@ -3,6 +3,42 @@
   "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E1234567-89AB-4CDE-AF01-23456789ABC0}|Source\\Backend\\Rental.Web\\Rental.Web.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.web\\controllers\\webcontrollers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1234567-89AB-4CDE-AF01-23456789ABC0}|Source\\Backend\\Rental.Web\\Rental.Web.csproj|solutionrelative:source\\backend\\rental.web\\controllers\\webcontrollers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2C3D4E5-F6A7-4890-9B2C-3D4E5F6A7B8C}|Source\\Backend\\Rental.Application\\Rental.Application.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2C3D4E5-F6A7-4890-9B2C-3D4E5F6A7B8C}|Source\\Backend\\Rental.Application\\Rental.Application.csproj|solutionrelative:source\\backend\\rental.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4E5F6A7-B8C9-4012-BD4E-5F6A7B8C9D0E}|Source\\Backend\\Rental.Persistence\\Rental.Persistence.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.persistence\\rentaldbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4E5F6A7-B8C9-4012-BD4E-5F6A7B8C9D0E}|Source\\Backend\\Rental.Persistence\\Rental.Persistence.csproj|solutionrelative:source\\backend\\rental.persistence\\rentaldbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1234567-89AB-4CDE-AF01-23456789ABC0}|Source\\Backend\\Rental.Web\\Rental.Web.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E1234567-89AB-4CDE-AF01-23456789ABC0}|Source\\Backend\\Rental.Web\\Rental.Web.csproj|solutionrelative:source\\backend\\rental.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4789-8A1B-2C3D4E5F6A7B}|Source\\Backend\\Rental.Api\\Rental.Api.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-4789-8A1B-2C3D4E5F6A7B}|Source\\Backend\\Rental.Api\\Rental.Api.csproj|solutionrelative:source\\backend\\rental.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1234567-89AB-4CDE-AF01-23456789ABC0}|Source\\Backend\\Rental.Web\\Rental.Web.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.web\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E1234567-89AB-4CDE-AF01-23456789ABC0}|Source\\Backend\\Rental.Web\\Rental.Web.csproj|solutionrelative:source\\backend\\rental.web\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4789-8A1B-2C3D4E5F6A7B}|Source\\Backend\\Rental.Api\\Rental.Api.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-4789-8A1B-2C3D4E5F6A7B}|Source\\Backend\\Rental.Api\\Rental.Api.csproj|solutionrelative:source\\backend\\rental.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2C3D4E5-F6A7-4890-9B2C-3D4E5F6A7B8C}|Source\\Backend\\Rental.Application\\Rental.Application.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.application\\dtos\\transactiondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2C3D4E5-F6A7-4890-9B2C-3D4E5F6A7B8C}|Source\\Backend\\Rental.Application\\Rental.Application.csproj|solutionrelative:source\\backend\\rental.application\\dtos\\transactiondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F6A7B8C9-D0E1-4234-DF6A-7B8C9D0E1F2A}|Source\\Backend\\Rental.Infrastructure\\Rental.Infrastructure.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.infrastructure\\generator\\coregenerator.tt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F6A7B8C9-D0E1-4234-DF6A-7B8C9D0E1F2A}|Source\\Backend\\Rental.Infrastructure\\Rental.Infrastructure.csproj|solutionrelative:source\\backend\\rental.infrastructure\\generator\\coregenerator.tt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{31234567-89AB-4CDE-AF01-23456789ABC3}|Source\\Backend\\Rental.Localization\\Rental.Localization.csproj|c:\\users\\admin\\documents\\projects\\nhatro\\document\\source\\backend\\rental.localization\\languageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{31234567-89AB-4CDE-AF01-23456789ABC3}|Source\\Backend\\Rental.Localization\\Rental.Localization.csproj|solutionrelative:source\\backend\\rental.localization\\languageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -22,7 +58,116 @@
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RentalDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Persistence\\RentalDbContext.cs",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Persistence\\RentalDbContext.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Persistence\\RentalDbContext.cs",
+              "RelativeToolTip": "Source\\Backend\\Rental.Persistence\\RentalDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T04:49:50.897Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WebControllers.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Web\\Controllers\\WebControllers.cs",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Web\\Controllers\\WebControllers.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Web\\Controllers\\WebControllers.cs",
+              "RelativeToolTip": "Source\\Backend\\Rental.Web\\Controllers\\WebControllers.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAowCgAAABKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T04:46:14.444Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Web\\appsettings.json",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Web\\appsettings.json",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Web\\appsettings.json",
+              "RelativeToolTip": "Source\\Backend\\Rental.Web\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABrAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-06-07T04:45:23.302Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Api\\appsettings.json",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Api\\appsettings.json",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Api\\appsettings.json",
+              "RelativeToolTip": "Source\\Backend\\Rental.Api\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABrAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-06-07T04:43:47.688Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Web\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Web\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Web\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "Source\\Backend\\Rental.Web\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-07T04:40:47.403Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "TransactionDto.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Application\\DTOs\\TransactionDto.cs",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Application\\DTOs\\TransactionDto.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Application\\DTOs\\TransactionDto.cs",
+              "RelativeToolTip": "Source\\Backend\\Rental.Application\\DTOs\\TransactionDto.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAlwBAAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T04:02:04.033Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CoreGenerator.tt",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Infrastructure\\Generator\\CoreGenerator.tt",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Infrastructure\\Generator\\CoreGenerator.tt",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Infrastructure\\Generator\\CoreGenerator.tt",
+              "RelativeToolTip": "Source\\Backend\\Rental.Infrastructure\\Generator\\CoreGenerator.tt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-06-06T20:12:57.558Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Api\\Program.cs",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Api\\Program.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Api\\Program.cs",
+              "RelativeToolTip": "Source\\Backend\\Rental.Api\\Program.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAQwCkAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-06T20:10:45.749Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Application\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Source\\Backend\\Rental.Application\\Services\\AuthService.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Application\\Services\\AuthService.cs",
+              "RelativeToolTip": "Source\\Backend\\Rental.Application\\Services\\AuthService.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAQwCUAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-06T20:06:43.951Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "JwtHelper.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Security\\Jwt\\JwtHelper.cs",
               "RelativeDocumentMoniker": "Source\\Backend\\Rental.Security\\Jwt\\JwtHelper.cs",
@@ -30,21 +175,19 @@
               "RelativeToolTip": "Source\\Backend\\Rental.Security\\Jwt\\JwtHelper.cs",
               "ViewState": "AgIAAAUAAAAAAAAAAAASwBkAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-06T19:58:04.418Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-06T19:58:04.418Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 9,
               "Title": "LanguageService.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Localization\\LanguageService.cs",
               "RelativeDocumentMoniker": "Source\\Backend\\Rental.Localization\\LanguageService.cs",
               "ToolTip": "C:\\Users\\Admin\\Documents\\Projects\\NhaTro\\Document\\Source\\Backend\\Rental.Localization\\LanguageService.cs",
               "RelativeToolTip": "Source\\Backend\\Rental.Localization\\LanguageService.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABAAAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-06T19:57:45.727Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-06T19:57:45.727Z"
             }
           ]
         }

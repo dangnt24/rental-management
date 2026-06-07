@@ -1,0 +1,93 @@
+@model Rental.Core.PagedResult<Rental.Application.DTOs.InvoiceDto>
+@{
+    ViewData["Title"] = "Hóa đơn";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Quản lý hóa đơn</h1>
+    <button onclick="openGenerateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Tạo hóa đơn</button>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Mã HĐ</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Phòng</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Kỳ</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Tổng tiền</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Đã thanh toán</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Còn lại</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Trạng thái</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Hạn thanh toán</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            @foreach (var inv in Model.Items)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-mono text-sm">@inv.InvoiceCode</td>
+                    <td class="px-4 py-3">@inv.RoomName</td>
+                    <td class="px-4 py-3 text-center">@inv.BillingMonth/@inv.BillingYear</td>
+                    <td class="px-4 py-3 text-right">@inv.TotalAmount.ToString("N0") đ</td>
+                    <td class="px-4 py-3 text-right">@inv.PaidAmount.ToString("N0") đ</td>
+                    <td class="px-4 py-3 text-right font-semibold @(inv.RemainingAmount > 0 ? "text-red-600" : "text-green-600")">
+                        @inv.RemainingAmount.ToString("N0") đ
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full @(inv.StatusCode == "PAID" ? "bg-green-100 text-green-700" : inv.StatusCode == "UNPAID" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700")">
+                            @(inv.StatusCode == "PAID" ? "Đã thanh toán" : inv.StatusCode == "UNPAID" ? "Chưa thanh toán" : "Quá hạn")
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-right">@(inv.DueDate?.ToString("dd/MM/yyyy") ?? "--")</td>
+                </tr>
+            }
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Chưa có hóa đơn</td></tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
+            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
+            <div class="flex gap-2">
+                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
+                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Generate Invoice Modal -->
+<div id="generateModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6">
+        <h2 class="text-lg font-bold mb-4">Tạo hóa đơn mới</h2>
+        <form asp-action="GenerateInvoice" method="post">
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Mã hợp đồng</label>
+                <input name="contractId" type="number" class="w-full border rounded-md px-3 py-2" required placeholder="Nhập ID hợp đồng" />
+            </div>
+            <div class="mb-3 grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Tháng</label>
+                    <input name="month" type="number" min="1" max="12" class="w-full border rounded-md px-3 py-2" required />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Năm</label>
+                    <input name="year" type="number" class="w-full border rounded-md px-3 py-2" required value="@DateTime.UtcNow.Year" />
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" onclick="closeGenerateModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Tạo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openGenerateModal() { document.getElementById('generateModal').classList.remove('hidden'); document.getElementById('generateModal').classList.add('flex'); }
+    function closeGenerateModal() { document.getElementById('generateModal').classList.add('hidden'); document.getElementById('generateModal').classList.remove('flex'); }
+</script>
