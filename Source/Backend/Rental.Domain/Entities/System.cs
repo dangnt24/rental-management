@@ -20,16 +20,13 @@ namespace Rental.Domain.Entities
     /// <summary>
     /// Quản lý cấu hình sinh mã tự động.
     /// </summary>
-    public class DocumentSetting
+    public class DocumentSetting : BaseEntity
     {
-        public int Id { get; set; }
         public string TransactionType { get; set; }
         public string Prefix { get; set; }
         public string DateFormat { get; set; }
         public int NumberDigits { get; set; }
         public int CurrentNumber { get; set; }
-        public DateTime? UpdatedDate { get; set; }
-        public int Version { get; set; } = 1;
     }
 
     /// <summary>

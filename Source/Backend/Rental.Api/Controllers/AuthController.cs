@@ -34,9 +34,9 @@ namespace Rental.Api.Controllers
         /// Làm mới Token.
         /// </summary>
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            var result = await _authService.RefreshTokenAsync(refreshToken);
+            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
             if (!result.IsSuccess) return StatusCode(result.StatusCode, result);
             return Ok(result);
         }

@@ -2,6 +2,7 @@ using Rental.Application.Interfaces.Persistence;
 using Rental.Application.Interfaces.Services;
 using Rental.Application.DTOs;
 using Rental.Core;
+using Rental.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<ContractSearchResult>>> SearchContractsAsync(SearchRequest request)
         {
-            var query = _unitOfWork.Contracts.Find(c => !c.IsDeleted)
+            var query = _unitOfWork.Contracts.Find(c => true)
                 .Include(c => c.Room)
                 .Include(c => c.ContractDetails).ThenInclude(cd => cd.Tenant)
                 .AsQueryable();
@@ -75,7 +76,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<PaymentSearchResult>>> SearchPaymentsAsync(SearchRequest request)
         {
-            var query = _unitOfWork.Payments.Find(p => !p.IsDeleted)
+            var query = _unitOfWork.Payments.Find(p => true)
                 .Include(p => p.Invoice).ThenInclude(i => i.Contract).ThenInclude(c => c.Room)
                 .AsQueryable();
 
@@ -123,7 +124,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<IncidentSearchResult>>> SearchIncidentsAsync(SearchRequest request)
         {
-            var query = _unitOfWork.Incidents.Find(i => !i.IsDeleted)
+            var query = _unitOfWork.Incidents.Find(i => true)
                 .Include(i => i.Room)
                 .Include(i => i.Tenant)
                 .AsQueryable();
@@ -175,7 +176,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<TenantSearchResult>>> SearchTenantsAsync(SearchRequest request)
         {
-            var query = _unitOfWork.Tenants.Find(t => !t.IsDeleted)
+            var query = _unitOfWork.Tenants.Find(t => true)
                 .Include(t => t.ContractDetails).ThenInclude(cd => cd.Contract).ThenInclude(c => c.Room)
                 .AsQueryable();
 
@@ -200,7 +201,7 @@ namespace Rental.Application.Services
             var results = items.Select(t =>
             {
                 var activeContract = t.ContractDetails?
-                    .FirstOrDefault(cd => cd.Contract.StatusCode == "ACTIVE")?.Contract;
+                    .FirstOrDefault(cd => cd.Contract.StatusCode == ContractStatus.Active)?.Contract;
                 return new TenantSearchResult
                 {
                     Id = t.Id,
@@ -224,7 +225,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<RoomSearchResult>>> SearchRoomsAsync(SearchRequest request)
         {
-            var query = _unitOfWork.Rooms.Find(r => !r.IsDeleted)
+            var query = _unitOfWork.Rooms.Find(r => true)
                 .Include(r => r.Branch)
                 .AsQueryable();
 
@@ -271,7 +272,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<InvoiceSearchResult>>> SearchInvoicesAsync(SearchRequest request)
         {
-            var query = _unitOfWork.Invoices.Find(i => !i.IsDeleted)
+            var query = _unitOfWork.Invoices.Find(i => true)
                 .Include(i => i.Contract).ThenInclude(c => c.Room)
                 .AsQueryable();
 

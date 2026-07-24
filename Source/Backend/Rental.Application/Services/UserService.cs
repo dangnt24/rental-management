@@ -27,15 +27,14 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<UserDto>> GetByIdAsync(int id)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
             if (user == null) return ApiResult<UserDto>.Failure("Không tìm thấy người dùng");
-            var dto = _mapper.Map<UserDto>(user);
-            return ApiResult<UserDto>.Success(dto);
+            return ApiResult<UserDto>.Success(_mapper.Map<UserDto>(user));
         }
 
         public async Task<ApiResult<PagedResult<UserDto>>> GetPagedListAsync(int pageNumber, int pageSize, string? searchTerm)
         {
-            var query = _unitOfWork.Users.Find(x => !x.IsDeleted);
+            var query = _unitOfWork.Users.Find(x => true);
 
             if (!string.IsNullOrEmpty(searchTerm))
                 query = query.Where(x => x.FullName.Contains(searchTerm) || x.Username.Contains(searchTerm) || x.Email.Contains(searchTerm));
@@ -68,8 +67,9 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<UserDto>> UpdateAsync(UserDto dto)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(dto.Id);
+            var user = await _unitOfWork.Users.Find(u => u.Id == dto.Id).FirstOrDefaultAsync();
             if (user == null) return ApiResult<UserDto>.Failure("Không tìm thấy người dùng");
+
             _mapper.Map(dto, user);
             _unitOfWork.Users.Update(user);
             await _unitOfWork.CompleteAsync();
@@ -78,8 +78,9 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<bool>> DeleteAsync(int id)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
             if (user == null) return ApiResult<bool>.Failure("Không tìm thấy người dùng");
+
             _unitOfWork.Users.Remove(user);
             await _unitOfWork.CompleteAsync();
             return ApiResult<bool>.Success(true);

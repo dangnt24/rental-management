@@ -25,13 +25,15 @@ namespace Rental.Application.DTOs
         public bool IsActive { get; set; }
     }
 
-    /// <summary>
-    /// Yêu cầu đăng nhập.
-    /// </summary>
     public class LoginRequest
     {
         public string Username { get; set; }
         public string Password { get; set; }
+    }
+
+    public class RefreshTokenRequest
+    {
+        public string RefreshToken { get; set; }
     }
 
     /// <summary>

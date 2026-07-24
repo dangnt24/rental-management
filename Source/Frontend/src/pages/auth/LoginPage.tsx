@@ -33,6 +33,7 @@ const LoginPage: React.FC = () => {
       setAuth(user, accessToken, refreshToken);
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      useAuthStore.getState().fetchMenus();
       navigate('/dashboard');
     } catch (error) {
       alert('Đăng nhập thất bại. Vui lòng kiểm tra lại!');

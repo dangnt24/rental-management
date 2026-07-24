@@ -24,14 +24,14 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<BranchDto>> GetByIdAsync(int id)
         {
-            var branch = await _unitOfWork.Branches.GetByIdAsync(id);
+            var branch = await _unitOfWork.Branches.Find(b => b.Id == id).FirstOrDefaultAsync();
             if (branch == null) return ApiResult<BranchDto>.Failure("Không tìm thấy chi nhánh");
             return ApiResult<BranchDto>.Success(_mapper.Map<BranchDto>(branch));
         }
 
         public async Task<ApiResult<List<BranchDto>>> GetAllAsync()
         {
-            var branches = await _unitOfWork.Branches.Find(x => !x.IsDeleted && x.IsActive).ToListAsync();
+            var branches = await _unitOfWork.Branches.Find(x => x.IsActive).OrderBy(x => x.BranchName).ToListAsync();
             return ApiResult<List<BranchDto>>.Success(_mapper.Map<List<BranchDto>>(branches));
         }
 
@@ -45,8 +45,9 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<BranchDto>> UpdateAsync(BranchDto dto)
         {
-            var branch = await _unitOfWork.Branches.GetByIdAsync(dto.Id);
+            var branch = await _unitOfWork.Branches.Find(b => b.Id == dto.Id).FirstOrDefaultAsync();
             if (branch == null) return ApiResult<BranchDto>.Failure("Không tìm thấy chi nhánh");
+
             _mapper.Map(dto, branch);
             _unitOfWork.Branches.Update(branch);
             await _unitOfWork.CompleteAsync();
@@ -55,8 +56,9 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<bool>> DeleteAsync(int id)
         {
-            var branch = await _unitOfWork.Branches.GetByIdAsync(id);
+            var branch = await _unitOfWork.Branches.Find(b => b.Id == id).FirstOrDefaultAsync();
             if (branch == null) return ApiResult<bool>.Failure("Không tìm thấy chi nhánh");
+
             _unitOfWork.Branches.Remove(branch);
             await _unitOfWork.CompleteAsync();
             return ApiResult<bool>.Success(true);

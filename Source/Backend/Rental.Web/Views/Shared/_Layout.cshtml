@@ -1,33 +1,134 @@
+@inject Rental.Application.Interfaces.Services.ICommonService CommonService
+@{
+    var menuItems = await CommonService.GetListByTypeAsync("MENU_ITEM");
+    var userName = Context.Session.GetString("UserName") ?? "Admin";
+    var roleCode = Context.Session.GetString("RoleCode") ?? "ADMIN";
+
+    var defaultMenus = new[] {
+        new { Code = "dashboard", Name = "Tổng quan", Icon = "chart-pie", Route = "/" },
+        new { Code = "rooms", Name = "Quản lý phòng", Icon = "door-open", Route = "/Room" },
+        new { Code = "tenants", Name = "Người thuê", Icon = "users", Route = "/Tenant" },
+        new { Code = "contracts", Name = "Hợp đồng", Icon = "file-contract", Route = "/Contract" },
+        new { Code = "billing", Name = "Hóa đơn & Tiền phòng", Icon = "receipt", Route = "/Billing" },
+        new { Code = "payments", Name = "Thanh toán", Icon = "credit-card", Route = "/Payment" },
+        new { Code = "incidents", Name = "Sự cố / Bảo trì", Icon = "exclamation-triangle", Route = "/Incident" },
+    };
+    var hasMenu = menuItems != null && menuItems.Any();
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rental Management - @ViewData["Title"]</title>
+    <title>@ViewData["Title"] - NhaTro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .sidebar-gradient { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
+        .sidebar-link { transition: all 0.2s; position: relative; }
+        .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+        .sidebar-link.active { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .sidebar-link.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #3b82f6; border-radius: 0 3px 3px 0; }
+        .card-hover { transition: all 0.3s; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="flex h-screen">
+<body class="bg-gray-50 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-64 bg-slate-800 text-white flex flex-col">
-            <div class="p-6 text-xl font-bold border-b border-slate-700">Rental Manager</div>
-            <nav class="flex-1 mt-4 overflow-y-auto">
-                <a href="/" class="block px-6 py-3 hover:bg-slate-700 transition">Tổng quan</a>
-                <a href="/Room" class="block px-6 py-3 hover:bg-slate-700 transition">Quản lý phòng</a>
-                <a href="/Tenant" class="block px-6 py-3 hover:bg-slate-700 transition">Người thuê</a>
-                <a href="/Contract" class="block px-6 py-3 hover:bg-slate-700 transition">Hợp đồng</a>
-                <a href="/Billing" class="block px-6 py-3 hover:bg-slate-700 transition">Hóa đơn</a>
-                <a href="/Payment" class="block px-6 py-3 hover:bg-slate-700 transition">Thanh toán</a>
-                <a href="/Incident" class="block px-6 py-3 hover:bg-slate-700 transition">Sự cố</a>
-            </nav>
-            <div class="p-4 border-t border-slate-700">
-                <a href="/Account/Logout" class="text-red-400 hover:text-red-300 text-sm">Đăng xuất</a>
+        <aside class="w-64 sidebar-gradient text-white flex flex-col flex-shrink-0">
+            <!-- Logo -->
+            <div class="h-16 flex items-center px-6 border-b border-white/10">
+                <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center mr-3 flex-shrink-0">
+                    <i class="fas fa-building text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base leading-tight">Quản lý Nhà trọ</h1>
+                    <p class="text-xs text-blue-300">Hệ thống quản lý</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="flex-1 p-8 overflow-auto">
-            @RenderBody()
+            <!-- Menu -->
+            <nav class="flex-1 py-4 overflow-y-auto">
+                <p class="px-6 text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Menu</p>
+                @if (hasMenu)
+                {
+                    foreach (var item in menuItems.OrderBy(m => m.SortOrder))
+                    {
+                        var url = "/" + item.Code.ToLower();
+                        var isActive = Context.Request.Path.StartsWithSegments(url) || 
+                            (item.Code == "dashboard" && Context.Request.Path.Value == "/");
+                        var icon = item.Remark ?? "circle";
+                        <a href="@url"
+                           class="sidebar-link flex items-center px-6 py-2.5 text-sm @(isActive ? "active" : "text-white/70 hover:text-white")">
+                            <i class="fas fa-@icon w-5 text-center mr-3 text-sm"></i>
+                            <span>@item.NameVi</span>
+                        </a>
+                    }
+                }
+                else
+                {
+                    foreach (var item in defaultMenus)
+                    {
+                        var isActive = Context.Request.Path.StartsWithSegments(item.Route) || 
+                            (item.Code == "dashboard" && Context.Request.Path.Value == "/");
+                        <a href="@item.Route"
+                           class="sidebar-link flex items-center px-6 py-2.5 text-sm @(isActive ? "active" : "text-white/70 hover:text-white")">
+                            <i class="fas fa-@item.Icon w-5 text-center mr-3 text-sm"></i>
+                            <span>@item.Name</span>
+                        </a>
+                    }
+                }
+            </nav>
+
+            <!-- User -->
+            <div class="border-t border-white/10 p-4">
+                <div class="flex items-center px-2">
+                    <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center mr-3 font-bold text-sm flex-shrink-0">
+                        @(string.IsNullOrEmpty(userName) ? 'U' : userName[0])
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-medium truncate">@userName</p>
+                        <p class="text-xs text-white/50 truncate">@roleCode</p>
+                    </div>
+                </div>
+                <a href="/Account/Logout" class="flex items-center mt-3 px-2 py-2 text-sm text-red-400 hover:text-red-300 rounded-lg hover:bg-white/5 transition">
+                    <i class="fas fa-sign-out-alt w-5 text-center mr-2"></i> Đăng xuất
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Header -->
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center px-6 sticky top-0 z-10 shadow-sm">
+                <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-home mr-2 text-gray-400"></i>
+                    <span class="font-medium">@ViewData["Title"]</span>
+                </div>
+                <div class="flex-1"></div>
+                <div class="flex items-center gap-4">
+                    <button class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition relative">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-medium text-gray-800">@userName</p>
+                            <p class="text-xs text-gray-400">@roleCode</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                            @(string.IsNullOrEmpty(userName) ? 'U' : userName[0])
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="flex-1 overflow-auto p-6 bg-gray-50">
+                @RenderBody()
+            </main>
         </div>
     </div>
 </body>

@@ -2,6 +2,7 @@ using Rental.Application.Interfaces.Persistence;
 using Rental.Application.Interfaces.Services;
 using Rental.Application.DTOs;
 using Rental.Core;
+using Rental.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,41 +14,52 @@ namespace Rental.Application.Services
     public class ReportService : IReportService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICommonService _commonService;
 
-        public ReportService(IUnitOfWork unitOfWork)
+        public ReportService(IUnitOfWork unitOfWork, ICommonService commonService)
         {
             _unitOfWork = unitOfWork;
+            _commonService = commonService;
         }
 
         public async Task<ApiResult<RevenueReportDto>> GetRevenueReportAsync(int year)
         {
             var invoices = await _unitOfWork.Invoices
-                .Find(i => !i.IsDeleted && i.BillingYear == year && i.StatusCode == "PAID")
+                .Find(i => i.BillingYear == year && i.StatusCode == InvoiceStatus.Paid)
                 .Include(i => i.InvoiceItems)
                 .ToListAsync();
+
+            var systemFees = await _unitOfWork.FeeTypes
+                .Find(f => f.IsSystem)
+                .ToListAsync();
+
+            var rentFeeIds = systemFees
+                .Where(f => f.FeeName == SystemFeeNames.Rent)
+                .Select(f => f.Id)
+                .ToHashSet();
+
+            var utilityFeeNames = new HashSet<string> { SystemFeeNames.Electricity, SystemFeeNames.Water };
 
             var monthlyRevenues = new List<MonthlyRevenue>();
 
             for (int m = 1; m <= 12; m++)
             {
                 var monthInvoices = invoices.Where(i => i.BillingMonth == m).ToList();
+                var allItems = monthInvoices.SelectMany(i => i.InvoiceItems ?? new List<Domain.Entities.InvoiceItem>()).ToList();
+
                 monthlyRevenues.Add(new MonthlyRevenue
                 {
                     Month = m,
-                    RentRevenue = monthInvoices
-                        .SelectMany(i => i.InvoiceItems ?? new List<Domain.Entities.InvoiceItem>())
-                        .Where(item => item.FeeTypeId == null || item.Description?.Contains("tiền phòng") == true)
+                    RentRevenue = allItems
+                        .Where(item => item.FeeTypeId.HasValue && rentFeeIds.Contains(item.FeeTypeId.Value))
                         .Sum(item => item.Amount),
-                    UtilityRevenue = monthInvoices
-                        .SelectMany(i => i.InvoiceItems ?? new List<Domain.Entities.InvoiceItem>())
-                        .Where(item => item.Description?.Contains("điện") == true || item.Description?.Contains("nước") == true)
+                    UtilityRevenue = allItems
+                        .Where(item => item.FeeTypeId.HasValue && systemFees.Any(sf => sf.Id == item.FeeTypeId && utilityFeeNames.Contains(sf.FeeName)))
                         .Sum(item => item.Amount),
-                    OtherRevenue = monthInvoices
-                        .SelectMany(i => i.InvoiceItems ?? new List<Domain.Entities.InvoiceItem>())
-                        .Where(item => item.FeeTypeId != null
-                            && !(item.Description?.Contains("tiền phòng") == true)
-                            && !(item.Description?.Contains("điện") == true)
-                            && !(item.Description?.Contains("nước") == true))
+                    OtherRevenue = allItems
+                        .Where(item => !item.FeeTypeId.HasValue ||
+                            !rentFeeIds.Contains(item.FeeTypeId.Value) &&
+                            !systemFees.Any(sf => sf.Id == item.FeeTypeId && utilityFeeNames.Contains(sf.FeeName)))
                         .Sum(item => item.Amount)
                 });
             }
@@ -66,7 +78,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<OccupancyReportDto>> GetOccupancyReportAsync(int? branchId)
         {
-            var roomsQuery = _unitOfWork.Rooms.Find(r => !r.IsDeleted).Include(r => r.Branch).AsQueryable();
+            var roomsQuery = _unitOfWork.Rooms.Find(r => true).Include(r => r.Branch).AsQueryable();
             if (branchId.HasValue)
                 roomsQuery = roomsQuery.Where(r => r.BranchId == branchId.Value);
 
@@ -77,15 +89,15 @@ namespace Rental.Application.Services
             {
                 BranchName = g.Key,
                 TotalRooms = g.Count(),
-                RentedRooms = g.Count(r => r.StatusCode == "RENTED")
+                RentedRooms = g.Count(r => r.StatusCode == RoomStatus.Rented)
             }).ToList();
 
             var dto = new OccupancyReportDto
             {
                 TotalRooms = rooms.Count,
-                RentedRooms = rooms.Count(r => r.StatusCode == "RENTED"),
-                EmptyRooms = rooms.Count(r => r.StatusCode == "EMPTY"),
-                MaintenanceRooms = rooms.Count(r => r.StatusCode == "MAINTENANCE"),
+                RentedRooms = rooms.Count(r => r.StatusCode == RoomStatus.Rented),
+                EmptyRooms = rooms.Count(r => r.StatusCode == RoomStatus.Empty),
+                MaintenanceRooms = rooms.Count(r => r.StatusCode == RoomStatus.Maintenance),
                 BranchDetails = branchDetails
             };
 
@@ -96,7 +108,7 @@ namespace Rental.Application.Services
         {
             var now = DateTime.UtcNow;
             var query = _unitOfWork.Invoices
-                .Find(i => !i.IsDeleted && i.StatusCode == "UNPAID" && i.DueDate < now)
+                .Find(i => i.StatusCode != InvoiceStatus.Paid && i.DueDate < now)
                 .Include(i => i.Contract).ThenInclude(c => c.Room)
                 .Include(i => i.Contract).ThenInclude(c => c.ContractDetails).ThenInclude(cd => cd.Tenant)
                 .AsQueryable();
@@ -128,7 +140,7 @@ namespace Rental.Application.Services
         public async Task<ApiResult<IncidentSummaryDto>> GetIncidentSummaryAsync(int? branchId, int? month, int? year)
         {
             var query = _unitOfWork.Incidents
-                .Find(i => !i.IsDeleted)
+                .Find(i => true)
                 .Include(i => i.Room)
                 .AsQueryable();
 
@@ -144,8 +156,8 @@ namespace Rental.Application.Services
             var dto = new IncidentSummaryDto
             {
                 TotalIncidents = incidents.Count,
-                ResolvedCount = incidents.Count(i => i.StatusCode == "RESOLVED"),
-                PendingCount = incidents.Count(i => i.StatusCode == "PENDING"),
+                ResolvedCount = incidents.Count(i => i.StatusCode == IncidentStatus.Resolved),
+                PendingCount = incidents.Count(i => i.StatusCode == IncidentStatus.Pending),
                 TotalRepairCost = incidents.Sum(i => i.RepairCost),
                 ByPriority = incidents
                     .GroupBy(i => i.PriorityCode)

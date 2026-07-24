@@ -26,7 +26,7 @@ namespace Rental.Application.DTOs
         public string IdentityNumber { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime? Dob { get; set; }
         public string GenderCode { get; set; }
         public string Hometown { get; set; }
         public string AddressTemporary { get; set; }

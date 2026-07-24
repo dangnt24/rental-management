@@ -6,33 +6,64 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>Đăng nhập - Rental System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Quản lý Nhà trọ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .login-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%); }
+        .login-card { backdrop-filter: blur(20px); background: rgba(255,255,255,0.95); }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-96 border border-gray-200">
-        <h1 class="text-2xl font-bold mb-6 text-center text-slate-800">Rental System</h1>
-        
-        @if (ViewBag.Error != null)
-        {
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-                @ViewBag.Error
+<body class="login-bg min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/30">
+                <i class="fas fa-building text-white text-2xl"></i>
             </div>
-        }
+            <h1 class="text-2xl font-bold text-white">Quản lý Nhà trọ</h1>
+            <p class="text-blue-200 text-sm mt-1">Hệ thống quản lý nhà trọ thông minh</p>
+        </div>
 
-        <form action="/Account/Login" method="post">
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Tên đăng nhập</label>
-                <input type="text" name="Username" class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none" required />
+        <div class="login-card rounded-2xl shadow-2xl p-8 border border-white/20">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">Đăng nhập</h2>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i> @ViewBag.Error
+                </div>
+            }
+
+            <form action="/Account/Login" method="post">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tên đăng nhập</label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" name="Username" required
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Mật khẩu</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="password" name="Password" required
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
+                    </div>
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
+                    <i class="fas fa-sign-in-alt mr-2"></i> ĐĂNG NHẬP
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-xs text-gray-400">
+                <p>Demo: admin / admin123</p>
             </div>
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Mật khẩu</label>
-                <input type="password" name="Password" class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none" required />
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-bold hover:bg-blue-700 transition">
-                ĐĂNG NHẬP
-            </button>
-        </form>
+        </div>
     </div>
 </body>
 </html>

@@ -24,18 +24,26 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const res = await axios.post(`${api.defaults.baseURL}/auth/refresh-token`, JSON.stringify(refreshToken), {
-          headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (res.status === 200) {
-          localStorage.setItem('accessToken', res.data.data.accessToken);
-          localStorage.setItem('refreshToken', res.data.data.refreshToken);
-          api.defaults.headers.common['Authorization'] = `Bearer ${res.data.data.accessToken}`;
+        if (!refreshToken) {
+          localStorage.clear();
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
+        const res = await axios.post(`${api.defaults.baseURL}/auth/refresh-token`,
+          { refreshToken },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        if (res.status === 200 && res.data?.isSuccess) {
+          const { accessToken, refreshToken: newRefreshToken } = res.data.data;
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', newRefreshToken);
+          api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {

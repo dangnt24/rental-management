@@ -24,14 +24,14 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<FeeTypeDto>> GetByIdAsync(int id)
         {
-            var feeType = await _unitOfWork.FeeTypes.GetByIdAsync(id);
+            var feeType = await _unitOfWork.FeeTypes.Find(f => f.Id == id).FirstOrDefaultAsync();
             if (feeType == null) return ApiResult<FeeTypeDto>.Failure("Không tìm thấy loại phí");
             return ApiResult<FeeTypeDto>.Success(_mapper.Map<FeeTypeDto>(feeType));
         }
 
         public async Task<ApiResult<PagedResult<FeeTypeDto>>> GetPagedListAsync(int pageNumber, int pageSize, int? branchId)
         {
-            var query = _unitOfWork.FeeTypes.Find(x => !x.IsDeleted);
+            var query = _unitOfWork.FeeTypes.Find(x => true);
 
             if (branchId.HasValue)
                 query = query.Where(x => x.BranchId == branchId.Value);
@@ -62,8 +62,9 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<FeeTypeDto>> UpdateAsync(FeeTypeDto dto)
         {
-            var feeType = await _unitOfWork.FeeTypes.GetByIdAsync(dto.Id);
+            var feeType = await _unitOfWork.FeeTypes.Find(f => f.Id == dto.Id).FirstOrDefaultAsync();
             if (feeType == null) return ApiResult<FeeTypeDto>.Failure("Không tìm thấy loại phí");
+
             _mapper.Map(dto, feeType);
             _unitOfWork.FeeTypes.Update(feeType);
             await _unitOfWork.CompleteAsync();
@@ -72,8 +73,9 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<bool>> DeleteAsync(int id)
         {
-            var feeType = await _unitOfWork.FeeTypes.GetByIdAsync(id);
+            var feeType = await _unitOfWork.FeeTypes.Find(f => f.Id == id).FirstOrDefaultAsync();
             if (feeType == null) return ApiResult<bool>.Failure("Không tìm thấy loại phí");
+
             _unitOfWork.FeeTypes.Remove(feeType);
             await _unitOfWork.CompleteAsync();
             return ApiResult<bool>.Success(true);

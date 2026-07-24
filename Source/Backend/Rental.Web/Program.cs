@@ -22,6 +22,8 @@ builder.Services.AddDbContext<RentalDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<ICommonService, CommonService>();
+builder.Services.AddScoped<IDocumentNumberingService, DocumentNumberingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IRoomService, RoomService>();

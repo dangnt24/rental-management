@@ -28,6 +28,7 @@ namespace Rental.Domain.Entities
         public int MaxOccupants { get; set; }
         public string StatusCode { get; set; }
         public string Description { get; set; }
+        public int DataRowVersion { get; set; } = 1;
 
         public virtual Branch Branch { get; set; }
         public virtual ICollection<Contract> Contracts { get; set; }
@@ -43,7 +44,7 @@ namespace Rental.Domain.Entities
         public string IdentityNumber { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
-        public System.DateTime? DateOfBirth { get; set; }
+        public System.DateTime? Dob { get; set; }
         public string GenderCode { get; set; }
         public string Hometown { get; set; }
         public string AddressTemporary { get; set; }

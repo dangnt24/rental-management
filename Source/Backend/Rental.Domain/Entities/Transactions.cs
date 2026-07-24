@@ -106,7 +106,7 @@ namespace Rental.Domain.Entities
     public class Incident : BaseEntity
     {
         public int RoomId { get; set; }
-        public int TenantId { get; set; }
+        public int? TenantId { get; set; }
         public string Description { get; set; }
         public string PriorityCode { get; set; }
         public string StatusCode { get; set; }

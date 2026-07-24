@@ -101,4 +101,25 @@ namespace Rental.Api.Controllers
             return Ok(result);
         }
     }
+
+    [Authorize]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class MenuController : ControllerBase
+    {
+        private readonly IMenuService _menuService;
+
+        public MenuController(IMenuService menuService)
+        {
+            _menuService = menuService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMenus()
+        {
+            var roleCode = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "STAFF";
+            var result = await _menuService.GetMenusAsync(roleCode);
+            return Ok(result);
+        }
+    }
 }

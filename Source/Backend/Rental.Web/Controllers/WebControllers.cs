@@ -38,8 +38,9 @@ namespace Rental.Web.Controllers
             var result = await _authService.LoginAsync(request);
             if (result.IsSuccess)
             {
-                // Simple cookie-less session for demo, in production use6 Cookie Auth
                 HttpContext.Session.SetString("Token", result.Data.AccessToken);
+                HttpContext.Session.SetString("UserName", result.Data.User.FullName);
+                HttpContext.Session.SetString("RoleCode", result.Data.User.RoleCode);
                 return RedirectToAction("Index", "Home");
             }
             ViewBag.Error = result.Message;

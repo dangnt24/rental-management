@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Rental.Api.Middleware;
 using Rental.Application.Interfaces.Persistence;
 using Rental.Application.Interfaces.Services;
 using Rental.Application.Mappings;
@@ -50,6 +51,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<ICommonService, CommonService>();
+builder.Services.AddScoped<IDocumentNumberingService, DocumentNumberingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
@@ -64,6 +67,7 @@ builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IFeeTypeService, FeeTypeService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 
 // 4. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -76,6 +80,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // 6. Cấu hình Middleware
+app.UseExceptionMiddleware();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -3,6 +3,7 @@ using Rental.Application.Interfaces.Services;
 using Rental.Application.DTOs;
 using Rental.Core;
 using Rental.Domain.Entities;
+using Rental.Domain.Constants;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -15,16 +16,21 @@ namespace Rental.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICommonService _commonService;
 
-        public PaymentService(IUnitOfWork unitOfWork, IMapper mapper)
+        public PaymentService(IUnitOfWork unitOfWork, IMapper mapper, ICommonService commonService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _commonService = commonService;
         }
 
         public async Task<ApiResult<PaymentDto>> ProcessPaymentAsync(PaymentDto paymentDto)
         {
-            var invoice = await _unitOfWork.Invoices.GetByIdAsync(paymentDto.InvoiceId);
+            await _commonService.EnsureCodeExistsAsync(CommonTypes.InvoiceStatus, InvoiceStatus.Paid);
+            await _commonService.EnsureCodeExistsAsync(CommonTypes.InvoiceStatus, InvoiceStatus.Partial);
+
+            var invoice = await _unitOfWork.Invoices.Find(i => i.Id == paymentDto.InvoiceId).FirstOrDefaultAsync();
             if (invoice == null) return ApiResult<PaymentDto>.Failure("Không tìm thấy hóa đơn");
 
             var payment = _mapper.Map<Payment>(paymentDto);
@@ -36,7 +42,7 @@ namespace Rental.Application.Services
                 .SumAsync(p => p.Amount);
 
             invoice.PaidAmount = totalPaid;
-            invoice.StatusCode = totalPaid >= invoice.TotalAmount ? "PAID" : "PARTIAL";
+            invoice.StatusCode = totalPaid >= invoice.TotalAmount ? InvoiceStatus.Paid : InvoiceStatus.Partial;
             _unitOfWork.Invoices.Update(invoice);
             await _unitOfWork.CompleteAsync();
 
@@ -45,7 +51,7 @@ namespace Rental.Application.Services
 
         public async Task<ApiResult<PagedResult<PaymentDto>>> GetPagedListAsync(int pageNumber, int pageSize, int? invoiceId)
         {
-            var query = _unitOfWork.Payments.Find(x => !x.IsDeleted);
+            var query = _unitOfWork.Payments.Find(x => true);
 
             if (invoiceId.HasValue)
                 query = query.Where(x => x.InvoiceId == invoiceId.Value);
