@@ -4,8 +4,10 @@
 }
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Quản lý sự cố</h1>
-    <button onclick="openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Báo sự cố</button>
+    <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>Quản lý sự cố</h1>
+    <button onclick="openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm">
+        <i class="fas fa-plus mr-1"></i> Báo sự cố
+    </button>
 </div>
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -40,6 +42,9 @@
                     <td class="px-4 py-3 text-center">@inc.ReportedDate.ToString("dd/MM/yyyy")</td>
                     <td class="px-4 py-3 text-right">@inc.RepairCost.ToString("N0") đ</td>
                     <td class="px-4 py-3 text-right">
+                        <a href="/Incident/Details/@inc.Id" class="text-blue-600 hover:text-blue-800 text-sm mr-2" title="Chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </a>
                         @if (inc.StatusCode != "RESOLVED")
                         {
                             <form asp-action="Update" method="post" class="inline">
@@ -51,12 +56,16 @@
                                 <input type="hidden" name="StatusCode" value="RESOLVED" />
                                 <input type="hidden" name="RepairCost" value="@inc.RepairCost" />
                                 <input type="hidden" name="ReportedDate" value="@inc.ReportedDate.ToString("o")" />
-                                <button type="submit" class="text-green-600 hover:text-green-800 text-sm mr-2">Xác nhận xử lý</button>
+                                <button type="submit" class="text-green-600 hover:text-green-800 text-sm mr-2" title="Xác nhận xử lý">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
                             </form>
                         }
                         <form asp-action="Delete" method="post" class="inline" onsubmit="return confirm('Xóa sự cố này?')">
                             <input type="hidden" name="id" value="@inc.Id" />
-                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Xóa</button>
+                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -67,22 +76,13 @@
             }
         </tbody>
     </table>
-    @if (Model.TotalPages > 1)
-    {
-        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
-            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
-            <div class="flex gap-2">
-                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
-                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
-            </div>
-        </div>
-    }
+    @await Html.PartialAsync("_Pagination", Model)
 </div>
 
 <!-- Create Modal -->
 <div id="createModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-        <h2 class="text-lg font-bold mb-4">Báo sự cố mới</h2>
+        <h2 class="text-lg font-bold mb-4"><i class="fas fa-exclamation-circle text-red-600 mr-2"></i>Báo sự cố mới</h2>
         <form asp-action="Create" method="post">
             <div class="mb-3">
                 <label class="block text-sm font-medium mb-1">ID Phòng</label>
@@ -109,8 +109,8 @@
                 <input name="RepairCost" type="number" class="w-full border rounded-md px-3 py-2" value="0" />
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Báo cáo</button>
+                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 border rounded-md text-sm hover:bg-gray-50"><i class="fas fa-times mr-1"></i>Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"><i class="fas fa-paper-plane mr-1"></i>Báo cáo</button>
             </div>
         </form>
     </div>

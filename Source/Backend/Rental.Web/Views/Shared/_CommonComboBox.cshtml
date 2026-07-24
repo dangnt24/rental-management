@@ -1,0 +1,50 @@
+@model Rental.Web.ViewModels.CommonComboBoxModel
+@inject Rental.Application.Interfaces.Services.ICommonService CommonService
+@{
+    var items = await CommonService.GetListByTypeAsync(Model.Type);
+    var selectedValue = Model.SelectedValue ?? Model.DefaultValue;
+}
+<div class="@Model.WrapperClass">
+    @if (!string.IsNullOrEmpty(Model.Label))
+    {
+        <label class="block text-sm font-medium mb-1">@Model.Label</label>
+    }
+    @if (Model.EnableSearch)
+    {
+        <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input type="text" id="@(Model.Name)_search" placeholder="Tìm kiếm..."
+                   class="w-full border rounded-md pl-9 pr-3 py-2 text-sm mb-1"
+                   oninput="filterComboBox('@(Model.Name)')" />
+        </div>
+    }
+    <select name="@Model.Name" id="@Model.Name"
+            class="w-full border rounded-md px-3 py-2 text-sm @(Model.EnableSearch ? "mt-1" : "")"
+            @(Model.Required ? "required" : "")>
+        @if (Model.ShowPlaceholder)
+        {
+            <option value="">@(Model.PlaceholderText ?? "-- Chọn --")</option>
+        }
+        @foreach (var item in items)
+        {
+            <option value="@item.Code" selected="@(item.Code == selectedValue)">
+                @item.NameVi
+            </option>
+        }
+    </select>
+</div>
+
+@if (Model.EnableSearch)
+{
+    <script>
+        function filterComboBox(selectId) {
+            var search = document.getElementById(selectId + '_search');
+            var select = document.getElementById(selectId);
+            var filter = search.value.toLowerCase();
+            for (var i = 0; i < select.options.length; i++) {
+                var text = select.options[i].text.toLowerCase();
+                select.options[i].style.display = text.includes(filter) ? '' : 'none';
+            }
+        }
+    </script>
+}

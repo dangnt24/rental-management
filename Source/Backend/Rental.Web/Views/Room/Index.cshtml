@@ -4,8 +4,10 @@
 }
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Quản lý phòng</h1>
-    <button onclick="openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Thêm phòng</button>
+    <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-door-open text-blue-600 mr-2"></i>Quản lý phòng</h1>
+    <button onclick="openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm">
+        <i class="fas fa-plus mr-1"></i> Thêm phòng
+    </button>
 </div>
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -32,10 +34,17 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                        <button onclick="openEditModal(@room.Id, '@room.RoomName', @room.Price, @room.MaxOccupants, '@room.StatusCode', '@room.Description')" class="text-blue-600 hover:text-blue-800 text-sm mr-2">Sửa</button>
+                        <a href="/Room/Details/@room.Id" class="text-green-600 hover:text-green-800 text-sm mr-2" title="Xem ảnh">
+                            <i class="fas fa-images"></i>
+                        </a>
+                        <button onclick="openEditModal(@room.Id, '@room.RoomName', @room.Price, @room.MaxOccupants, '@room.StatusCode', '@room.Description')" class="text-blue-600 hover:text-blue-800 text-sm mr-2" title="Sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
                         <form asp-action="Delete" asp-controller="Room" method="post" class="inline" onsubmit="return confirm('Xóa phòng này?')">
                             <input type="hidden" name="id" value="@room.Id" />
-                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Xóa</button>
+                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -46,28 +55,13 @@
             }
         </tbody>
     </table>
-    @if (Model.TotalPages > 1)
-    {
-        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
-            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
-            <div class="flex gap-2">
-                @if (Model.PageNumber > 1)
-                {
-                    <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm hover:bg-gray-50">Trước</a>
-                }
-                @if (Model.PageNumber < Model.TotalPages)
-                {
-                    <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm hover:bg-gray-50">Sau</a>
-                }
-            </div>
-        </div>
-    }
+    @await Html.PartialAsync("_Pagination", Model)
 </div>
 
 <!-- Create Modal -->
 <div id="createModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <h2 class="text-lg font-bold mb-4">Thêm phòng</h2>
+        <h2 class="text-lg font-bold mb-4"><i class="fas fa-plus-circle text-blue-600 mr-2"></i>Thêm phòng</h2>
         <form asp-action="Create" method="post">
             <div class="mb-3">
                 <label class="block text-sm font-medium mb-1">Tên phòng</label>
@@ -86,8 +80,8 @@
                 <textarea name="Description" class="w-full border rounded-md px-3 py-2" rows="2"></textarea>
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Lưu</button>
+                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 border rounded-md text-sm hover:bg-gray-50"><i class="fas fa-times mr-1"></i>Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"><i class="fas fa-save mr-1"></i>Lưu</button>
             </div>
         </form>
     </div>
@@ -96,7 +90,7 @@
 <!-- Edit Modal -->
 <div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <h2 class="text-lg font-bold mb-4">Sửa phòng</h2>
+        <h2 class="text-lg font-bold mb-4"><i class="fas fa-edit text-blue-600 mr-2"></i>Sửa phòng</h2>
         <form asp-action="Edit" method="post">
             <input type="hidden" name="Id" id="editId" />
             <div class="mb-3">
@@ -116,8 +110,8 @@
                 <textarea name="Description" id="editDescription" class="w-full border rounded-md px-3 py-2" rows="2"></textarea>
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Lưu</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-md text-sm hover:bg-gray-50"><i class="fas fa-times mr-1"></i>Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"><i class="fas fa-save mr-1"></i>Lưu</button>
             </div>
         </form>
     </div>

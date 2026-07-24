@@ -4,8 +4,10 @@
 }
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Hợp đồng thuê phòng</h1>
-    <a href="/Contract/Create" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Tạo hợp đồng</a>
+    <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-file-contract text-blue-600 mr-2"></i>Hợp đồng thuê phòng</h1>
+    <a href="/Contract/Create" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm">
+        <i class="fas fa-plus mr-1"></i> Tạo hợp đồng
+    </a>
 </div>
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -36,12 +38,19 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                        <a href="/Contract/Details/@c.Id" class="text-blue-600 hover:text-blue-800 text-sm mr-2">Chi tiết</a>
+                        <a href="/Contract/Details/@c.Id" class="text-blue-600 hover:text-blue-800 text-sm mr-2" title="Chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/Contract/Edit/@c.Id" class="text-indigo-600 hover:text-indigo-800 text-sm mr-2" title="Sửa">
+                            <i class="fas fa-edit"></i>
+                        </a>
                         @if (c.StatusCode == "ACTIVE")
                         {
                             <form asp-action="Terminate" method="post" class="inline" onsubmit="return confirm('Kết thúc hợp đồng này?')">
                                 <input type="hidden" name="id" value="@c.Id" />
-                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Kết thúc</button>
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm" title="Kết thúc">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
                             </form>
                         }
                     </td>
@@ -53,14 +62,5 @@
             }
         </tbody>
     </table>
-    @if (Model.TotalPages > 1)
-    {
-        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
-            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
-            <div class="flex gap-2">
-                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
-                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
-            </div>
-        </div>
-    }
+    @await Html.PartialAsync("_Pagination", Model)
 </div>

@@ -4,8 +4,10 @@
 }
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Quản lý hóa đơn</h1>
-    <button onclick="openGenerateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Tạo hóa đơn</button>
+    <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-receipt text-blue-600 mr-2"></i>Quản lý hóa đơn</h1>
+    <button onclick="openGenerateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm">
+        <i class="fas fa-plus mr-1"></i> Tạo hóa đơn
+    </button>
 </div>
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -48,22 +50,13 @@
             }
         </tbody>
     </table>
-    @if (Model.TotalPages > 1)
-    {
-        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
-            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
-            <div class="flex gap-2">
-                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
-                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
-            </div>
-        </div>
-    }
+    @await Html.PartialAsync("_Pagination", Model)
 </div>
 
 <!-- Generate Invoice Modal -->
 <div id="generateModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6">
-        <h2 class="text-lg font-bold mb-4">Tạo hóa đơn mới</h2>
+        <h2 class="text-lg font-bold mb-4"><i class="fas fa-file-invoice text-blue-600 mr-2"></i>Tạo hóa đơn mới</h2>
         <form asp-action="GenerateInvoice" method="post">
             <div class="mb-3">
                 <label class="block text-sm font-medium mb-1">Mã hợp đồng</label>
@@ -80,8 +73,8 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2 mt-4">
-                <button type="button" onclick="closeGenerateModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Tạo</button>
+                <button type="button" onclick="closeGenerateModal()" class="px-4 py-2 border rounded-md text-sm hover:bg-gray-50"><i class="fas fa-times mr-1"></i>Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"><i class="fas fa-check mr-1"></i>Tạo</button>
             </div>
         </form>
     </div>

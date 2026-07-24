@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict WM0axEjM45EXKWbjPdvfRnRhB7WzPnS4lfftqHmkkaqRsst8gDv1pXshXj1KFmF
+\restrict o22hNadVOMHMZwpo71r1V4P6Jau3flWORzBHSLYIlNeo7sal2tQ2fFpE56W0BKk
 
 -- Dumped from database version 18.3
 -- Dumped by pg_dump version 18.3
 
--- Started on 2026-07-24 10:38:42
+-- Started on 2026-07-23 16:36:27
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,7 +22,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 260 (class 1255 OID 26466)
+-- TOC entry 249 (class 1255 OID 17770)
 -- Name: sy_fn_check_exists(text, text, text); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -44,7 +44,7 @@ $_$;
 ALTER FUNCTION public.sy_fn_check_exists(p_table_name text, p_column_name text, p_value text) OWNER TO postgres;
 
 --
--- TOC entry 261 (class 1255 OID 26467)
+-- TOC entry 251 (class 1255 OID 17772)
 -- Name: sy_fn_check_is_used(text, anyelement); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -89,7 +89,7 @@ $_$;
 ALTER FUNCTION public.sy_fn_check_is_used(p_table_name text, p_id_value anyelement) OWNER TO postgres;
 
 --
--- TOC entry 262 (class 1255 OID 26468)
+-- TOC entry 250 (class 1255 OID 17771)
 -- Name: sy_fn_get_list_data(text, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -113,7 +113,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 219 (class 1259 OID 26469)
+-- TOC entry 228 (class 1259 OID 17565)
 -- Name: ms_branches; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -137,7 +137,7 @@ CREATE TABLE public.ms_branches (
 ALTER TABLE public.ms_branches OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 26480)
+-- TOC entry 227 (class 1259 OID 17564)
 -- Name: ms_branches_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -152,7 +152,7 @@ ALTER TABLE public.ms_branches ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY 
 
 
 --
--- TOC entry 221 (class 1259 OID 26481)
+-- TOC entry 234 (class 1259 OID 17613)
 -- Name: ms_fee_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -178,7 +178,7 @@ CREATE TABLE public.ms_fee_types (
 ALTER TABLE public.ms_fee_types OWNER TO postgres;
 
 --
--- TOC entry 222 (class 1259 OID 26494)
+-- TOC entry 233 (class 1259 OID 17612)
 -- Name: ms_fee_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -193,7 +193,7 @@ ALTER TABLE public.ms_fee_types ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY
 
 
 --
--- TOC entry 223 (class 1259 OID 26495)
+-- TOC entry 230 (class 1259 OID 17577)
 -- Name: ms_rooms; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -220,7 +220,7 @@ CREATE TABLE public.ms_rooms (
 ALTER TABLE public.ms_rooms OWNER TO postgres;
 
 --
--- TOC entry 224 (class 1259 OID 26508)
+-- TOC entry 229 (class 1259 OID 17576)
 -- Name: ms_rooms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -235,7 +235,7 @@ ALTER TABLE public.ms_rooms ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 240 (class 1259 OID 26757)
+-- TOC entry 232 (class 1259 OID 17596)
 -- Name: ms_tenants; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -266,7 +266,7 @@ CREATE TABLE public.ms_tenants (
 ALTER TABLE public.ms_tenants OWNER TO postgres;
 
 --
--- TOC entry 241 (class 1259 OID 26768)
+-- TOC entry 231 (class 1259 OID 17595)
 -- Name: ms_tenants_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -281,7 +281,7 @@ ALTER TABLE public.ms_tenants ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 225 (class 1259 OID 26509)
+-- TOC entry 220 (class 1259 OID 17491)
 -- Name: sy_commons; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -309,7 +309,7 @@ CREATE TABLE public.sy_commons (
 ALTER TABLE public.sy_commons OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 26524)
+-- TOC entry 219 (class 1259 OID 17490)
 -- Name: sy_commons_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -324,7 +324,7 @@ ALTER TABLE public.sy_commons ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 227 (class 1259 OID 26525)
+-- TOC entry 226 (class 1259 OID 17554)
 -- Name: sy_document_settings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -349,7 +349,7 @@ CREATE TABLE public.sy_document_settings (
 ALTER TABLE public.sy_document_settings OWNER TO postgres;
 
 --
--- TOC entry 228 (class 1259 OID 26534)
+-- TOC entry 225 (class 1259 OID 17553)
 -- Name: sy_document_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -364,7 +364,7 @@ ALTER TABLE public.sy_document_settings ALTER COLUMN id ADD GENERATED ALWAYS AS 
 
 
 --
--- TOC entry 229 (class 1259 OID 26535)
+-- TOC entry 221 (class 1259 OID 17508)
 -- Name: sy_file_attachments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -390,7 +390,7 @@ CREATE TABLE public.sy_file_attachments (
 ALTER TABLE public.sy_file_attachments OWNER TO postgres;
 
 --
--- TOC entry 230 (class 1259 OID 26547)
+-- TOC entry 248 (class 1259 OID 17774)
 -- Name: sy_permissions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -412,7 +412,7 @@ CREATE TABLE public.sy_permissions (
 ALTER TABLE public.sy_permissions OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 26557)
+-- TOC entry 222 (class 1259 OID 17521)
 -- Name: sy_roles; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -434,7 +434,7 @@ CREATE TABLE public.sy_roles (
 ALTER TABLE public.sy_roles OWNER TO postgres;
 
 --
--- TOC entry 232 (class 1259 OID 26568)
+-- TOC entry 224 (class 1259 OID 17532)
 -- Name: sy_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -466,7 +466,7 @@ CREATE TABLE public.sy_users (
 ALTER TABLE public.sy_users OWNER TO postgres;
 
 --
--- TOC entry 233 (class 1259 OID 26582)
+-- TOC entry 223 (class 1259 OID 17531)
 -- Name: sy_users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -481,7 +481,7 @@ ALTER TABLE public.sy_users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 234 (class 1259 OID 26583)
+-- TOC entry 237 (class 1259 OID 17650)
 -- Name: tr_contract_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -495,7 +495,7 @@ CREATE TABLE public.tr_contract_details (
 ALTER TABLE public.tr_contract_details OWNER TO postgres;
 
 --
--- TOC entry 235 (class 1259 OID 26589)
+-- TOC entry 236 (class 1259 OID 17631)
 -- Name: tr_contracts; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -523,7 +523,7 @@ CREATE TABLE public.tr_contracts (
 ALTER TABLE public.tr_contracts OWNER TO postgres;
 
 --
--- TOC entry 236 (class 1259 OID 26601)
+-- TOC entry 235 (class 1259 OID 17630)
 -- Name: tr_contracts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -538,7 +538,7 @@ ALTER TABLE public.tr_contracts ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY
 
 
 --
--- TOC entry 237 (class 1259 OID 26602)
+-- TOC entry 247 (class 1259 OID 17745)
 -- Name: tr_incidents; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -566,7 +566,7 @@ CREATE TABLE public.tr_incidents (
 ALTER TABLE public.tr_incidents OWNER TO postgres;
 
 --
--- TOC entry 238 (class 1259 OID 26614)
+-- TOC entry 246 (class 1259 OID 17744)
 -- Name: tr_incidents_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -581,7 +581,7 @@ ALTER TABLE public.tr_incidents ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY
 
 
 --
--- TOC entry 239 (class 1259 OID 26615)
+-- TOC entry 243 (class 1259 OID 17707)
 -- Name: tr_invoice_items; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -607,7 +607,7 @@ CREATE TABLE public.tr_invoice_items (
 ALTER TABLE public.tr_invoice_items OWNER TO postgres;
 
 --
--- TOC entry 242 (class 1259 OID 26974)
+-- TOC entry 242 (class 1259 OID 17706)
 -- Name: tr_invoice_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -622,7 +622,7 @@ ALTER TABLE public.tr_invoice_items ALTER COLUMN id ADD GENERATED ALWAYS AS IDEN
 
 
 --
--- TOC entry 243 (class 1259 OID 26975)
+-- TOC entry 241 (class 1259 OID 17683)
 -- Name: tr_invoices; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -651,7 +651,7 @@ CREATE TABLE public.tr_invoices (
 ALTER TABLE public.tr_invoices OWNER TO postgres;
 
 --
--- TOC entry 244 (class 1259 OID 26986)
+-- TOC entry 240 (class 1259 OID 17682)
 -- Name: tr_invoices_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -666,7 +666,7 @@ ALTER TABLE public.tr_invoices ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY 
 
 
 --
--- TOC entry 245 (class 1259 OID 26987)
+-- TOC entry 245 (class 1259 OID 17729)
 -- Name: tr_payments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -692,7 +692,7 @@ CREATE TABLE public.tr_payments (
 ALTER TABLE public.tr_payments OWNER TO postgres;
 
 --
--- TOC entry 246 (class 1259 OID 26998)
+-- TOC entry 244 (class 1259 OID 17728)
 -- Name: tr_payments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -707,7 +707,7 @@ ALTER TABLE public.tr_payments ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY 
 
 
 --
--- TOC entry 247 (class 1259 OID 26999)
+-- TOC entry 239 (class 1259 OID 17669)
 -- Name: tr_utility_readings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -733,7 +733,7 @@ CREATE TABLE public.tr_utility_readings (
 ALTER TABLE public.tr_utility_readings OWNER TO postgres;
 
 --
--- TOC entry 248 (class 1259 OID 27007)
+-- TOC entry 238 (class 1259 OID 17668)
 -- Name: tr_utility_readings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -748,7 +748,7 @@ ALTER TABLE public.tr_utility_readings ALTER COLUMN id ADD GENERATED ALWAYS AS I
 
 
 --
--- TOC entry 4908 (class 2606 OID 27009)
+-- TOC entry 4925 (class 2606 OID 17575)
 -- Name: ms_branches ms_branches_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -757,7 +757,7 @@ ALTER TABLE ONLY public.ms_branches
 
 
 --
--- TOC entry 4910 (class 2606 OID 27011)
+-- TOC entry 4932 (class 2606 OID 17624)
 -- Name: ms_fee_types ms_fee_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -766,7 +766,7 @@ ALTER TABLE ONLY public.ms_fee_types
 
 
 --
--- TOC entry 4913 (class 2606 OID 27013)
+-- TOC entry 4928 (class 2606 OID 17589)
 -- Name: ms_rooms ms_rooms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -775,7 +775,7 @@ ALTER TABLE ONLY public.ms_rooms
 
 
 --
--- TOC entry 4944 (class 2606 OID 26973)
+-- TOC entry 4930 (class 2606 OID 17606)
 -- Name: ms_tenants ms_tenants_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -784,7 +784,7 @@ ALTER TABLE ONLY public.ms_tenants
 
 
 --
--- TOC entry 4916 (class 2606 OID 27015)
+-- TOC entry 4909 (class 2606 OID 17505)
 -- Name: sy_commons sy_commons_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -793,7 +793,7 @@ ALTER TABLE ONLY public.sy_commons
 
 
 --
--- TOC entry 4918 (class 2606 OID 27017)
+-- TOC entry 4911 (class 2606 OID 17507)
 -- Name: sy_commons sy_commons_type_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -802,7 +802,7 @@ ALTER TABLE ONLY public.sy_commons
 
 
 --
--- TOC entry 4920 (class 2606 OID 27019)
+-- TOC entry 4921 (class 2606 OID 17561)
 -- Name: sy_document_settings sy_document_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -811,7 +811,7 @@ ALTER TABLE ONLY public.sy_document_settings
 
 
 --
--- TOC entry 4922 (class 2606 OID 27021)
+-- TOC entry 4923 (class 2606 OID 17563)
 -- Name: sy_document_settings sy_document_settings_transaction_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -820,7 +820,7 @@ ALTER TABLE ONLY public.sy_document_settings
 
 
 --
--- TOC entry 4924 (class 2606 OID 27023)
+-- TOC entry 4913 (class 2606 OID 17520)
 -- Name: sy_file_attachments sy_file_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -829,7 +829,7 @@ ALTER TABLE ONLY public.sy_file_attachments
 
 
 --
--- TOC entry 4926 (class 2606 OID 27025)
+-- TOC entry 4953 (class 2606 OID 17782)
 -- Name: sy_permissions sy_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -838,7 +838,7 @@ ALTER TABLE ONLY public.sy_permissions
 
 
 --
--- TOC entry 4928 (class 2606 OID 27027)
+-- TOC entry 4915 (class 2606 OID 17530)
 -- Name: sy_roles sy_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -847,7 +847,7 @@ ALTER TABLE ONLY public.sy_roles
 
 
 --
--- TOC entry 4930 (class 2606 OID 27029)
+-- TOC entry 4917 (class 2606 OID 17545)
 -- Name: sy_users sy_users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -856,7 +856,7 @@ ALTER TABLE ONLY public.sy_users
 
 
 --
--- TOC entry 4932 (class 2606 OID 27031)
+-- TOC entry 4919 (class 2606 OID 17547)
 -- Name: sy_users sy_users_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -865,7 +865,7 @@ ALTER TABLE ONLY public.sy_users
 
 
 --
--- TOC entry 4934 (class 2606 OID 27033)
+-- TOC entry 4938 (class 2606 OID 17657)
 -- Name: tr_contract_details tr_contract_details_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -874,7 +874,7 @@ ALTER TABLE ONLY public.tr_contract_details
 
 
 --
--- TOC entry 4936 (class 2606 OID 27035)
+-- TOC entry 4934 (class 2606 OID 17644)
 -- Name: tr_contracts tr_contracts_contract_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -883,7 +883,7 @@ ALTER TABLE ONLY public.tr_contracts
 
 
 --
--- TOC entry 4938 (class 2606 OID 27037)
+-- TOC entry 4936 (class 2606 OID 17642)
 -- Name: tr_contracts tr_contracts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -892,7 +892,7 @@ ALTER TABLE ONLY public.tr_contracts
 
 
 --
--- TOC entry 4940 (class 2606 OID 27039)
+-- TOC entry 4951 (class 2606 OID 17755)
 -- Name: tr_incidents tr_incidents_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -901,7 +901,7 @@ ALTER TABLE ONLY public.tr_incidents
 
 
 --
--- TOC entry 4942 (class 2606 OID 27041)
+-- TOC entry 4947 (class 2606 OID 17717)
 -- Name: tr_invoice_items tr_invoice_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -910,7 +910,7 @@ ALTER TABLE ONLY public.tr_invoice_items
 
 
 --
--- TOC entry 4947 (class 2606 OID 27043)
+-- TOC entry 4943 (class 2606 OID 17695)
 -- Name: tr_invoices tr_invoices_invoice_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -919,7 +919,7 @@ ALTER TABLE ONLY public.tr_invoices
 
 
 --
--- TOC entry 4949 (class 2606 OID 27045)
+-- TOC entry 4945 (class 2606 OID 17693)
 -- Name: tr_invoices tr_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -928,7 +928,7 @@ ALTER TABLE ONLY public.tr_invoices
 
 
 --
--- TOC entry 4951 (class 2606 OID 27047)
+-- TOC entry 4949 (class 2606 OID 17738)
 -- Name: tr_payments tr_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -937,7 +937,7 @@ ALTER TABLE ONLY public.tr_payments
 
 
 --
--- TOC entry 4953 (class 2606 OID 27049)
+-- TOC entry 4940 (class 2606 OID 17676)
 -- Name: tr_utility_readings tr_utility_readings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -946,7 +946,7 @@ ALTER TABLE ONLY public.tr_utility_readings
 
 
 --
--- TOC entry 4914 (class 1259 OID 27050)
+-- TOC entry 4907 (class 1259 OID 17768)
 -- Name: idx_common_type; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -954,7 +954,7 @@ CREATE INDEX idx_common_type ON public.sy_commons USING btree (type);
 
 
 --
--- TOC entry 4945 (class 1259 OID 27051)
+-- TOC entry 4941 (class 1259 OID 17767)
 -- Name: idx_invoice_contract; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -962,7 +962,7 @@ CREATE INDEX idx_invoice_contract ON public.tr_invoices USING btree (contract_id
 
 
 --
--- TOC entry 4911 (class 1259 OID 27052)
+-- TOC entry 4926 (class 1259 OID 17766)
 -- Name: idx_room_branch; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -970,7 +970,7 @@ CREATE INDEX idx_room_branch ON public.ms_rooms USING btree (branch_id);
 
 
 --
--- TOC entry 4954 (class 2606 OID 27053)
+-- TOC entry 4957 (class 2606 OID 17625)
 -- Name: ms_fee_types ms_fee_types_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -979,7 +979,7 @@ ALTER TABLE ONLY public.ms_fee_types
 
 
 --
--- TOC entry 4955 (class 2606 OID 27058)
+-- TOC entry 4955 (class 2606 OID 17590)
 -- Name: ms_rooms ms_rooms_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -988,7 +988,16 @@ ALTER TABLE ONLY public.ms_rooms
 
 
 --
--- TOC entry 4956 (class 2606 OID 27063)
+-- TOC entry 4956 (class 2606 OID 17607)
+-- Name: ms_tenants ms_tenants_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ms_tenants
+    ADD CONSTRAINT ms_tenants_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.sy_users(id);
+
+
+--
+-- TOC entry 4954 (class 2606 OID 17548)
 -- Name: sy_users sy_users_role_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -997,7 +1006,7 @@ ALTER TABLE ONLY public.sy_users
 
 
 --
--- TOC entry 4957 (class 2606 OID 27068)
+-- TOC entry 4959 (class 2606 OID 17658)
 -- Name: tr_contract_details tr_contract_details_contract_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1006,7 +1015,7 @@ ALTER TABLE ONLY public.tr_contract_details
 
 
 --
--- TOC entry 4958 (class 2606 OID 27073)
+-- TOC entry 4960 (class 2606 OID 17663)
 -- Name: tr_contract_details tr_contract_details_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1015,7 +1024,7 @@ ALTER TABLE ONLY public.tr_contract_details
 
 
 --
--- TOC entry 4959 (class 2606 OID 27078)
+-- TOC entry 4958 (class 2606 OID 17645)
 -- Name: tr_contracts tr_contracts_room_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1024,7 +1033,7 @@ ALTER TABLE ONLY public.tr_contracts
 
 
 --
--- TOC entry 4960 (class 2606 OID 27083)
+-- TOC entry 4967 (class 2606 OID 17756)
 -- Name: tr_incidents tr_incidents_room_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1033,7 +1042,7 @@ ALTER TABLE ONLY public.tr_incidents
 
 
 --
--- TOC entry 4961 (class 2606 OID 27088)
+-- TOC entry 4968 (class 2606 OID 17761)
 -- Name: tr_incidents tr_incidents_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1042,7 +1051,7 @@ ALTER TABLE ONLY public.tr_incidents
 
 
 --
--- TOC entry 4962 (class 2606 OID 27093)
+-- TOC entry 4964 (class 2606 OID 17723)
 -- Name: tr_invoice_items tr_invoice_items_fee_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1051,7 +1060,7 @@ ALTER TABLE ONLY public.tr_invoice_items
 
 
 --
--- TOC entry 4963 (class 2606 OID 27098)
+-- TOC entry 4965 (class 2606 OID 17718)
 -- Name: tr_invoice_items tr_invoice_items_invoice_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1060,7 +1069,7 @@ ALTER TABLE ONLY public.tr_invoice_items
 
 
 --
--- TOC entry 4964 (class 2606 OID 27103)
+-- TOC entry 4962 (class 2606 OID 17701)
 -- Name: tr_invoices tr_invoices_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1069,7 +1078,7 @@ ALTER TABLE ONLY public.tr_invoices
 
 
 --
--- TOC entry 4965 (class 2606 OID 27108)
+-- TOC entry 4963 (class 2606 OID 17696)
 -- Name: tr_invoices tr_invoices_contract_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1078,7 +1087,7 @@ ALTER TABLE ONLY public.tr_invoices
 
 
 --
--- TOC entry 4966 (class 2606 OID 27113)
+-- TOC entry 4966 (class 2606 OID 17739)
 -- Name: tr_payments tr_payments_invoice_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1087,7 +1096,7 @@ ALTER TABLE ONLY public.tr_payments
 
 
 --
--- TOC entry 4967 (class 2606 OID 27118)
+-- TOC entry 4961 (class 2606 OID 17677)
 -- Name: tr_utility_readings tr_utility_readings_room_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1095,11 +1104,11 @@ ALTER TABLE ONLY public.tr_utility_readings
     ADD CONSTRAINT tr_utility_readings_room_id_fkey FOREIGN KEY (room_id) REFERENCES public.ms_rooms(id);
 
 
--- Completed on 2026-07-24 10:38:43
+-- Completed on 2026-07-23 16:36:28
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict WM0axEjM45EXKWbjPdvfRnRhB7WzPnS4lfftqHmkkaqRsst8gDv1pXshXj1KFmF
+\unrestrict o22hNadVOMHMZwpo71r1V4P6Jau3flWORzBHSLYIlNeo7sal2tQ2fFpE56W0BKk
 

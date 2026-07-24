@@ -1,0 +1,59 @@
+@model Rental.Web.ViewModels.ImageUploadModel
+@{
+    var inputId = $"img_{Model.Name}_{Guid.NewGuid():N}";
+    var previewId = $"preview_{inputId}";
+}
+<div class="@(Model.WrapperClass)">
+    @if (!string.IsNullOrEmpty(Model.Label))
+    {
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-image mr-1"></i>@Model.Label
+        </label>
+    }
+    <div class="flex items-center gap-4">
+        <div id="@previewId"
+             class="w-24 h-24 rounded-lg border-2 border-dashed @(!string.IsNullOrEmpty(Model.CurrentImageUrl) ? "border-blue-300" : "border-gray-300") flex items-center justify-center overflow-hidden bg-gray-50">
+            @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
+            {
+                <img src="@Model.CurrentImageUrl" alt="Preview" class="w-full h-full object-cover" />
+            }
+            else
+            {
+                <i class="fas fa-camera text-gray-300 text-2xl"></i>
+            }
+        </div>
+        <div class="flex-1">
+            <label for="@inputId"
+                   class="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 transition">
+                <i class="fas fa-upload mr-2"></i>
+                <span>@(Model.ButtonText ?? "Chọn ảnh")</span>
+            </label>
+            <input type="file" id="@inputId"
+                   name="@Model.Name"
+                   class="hidden"
+                   accept="image/jpeg,image/png,image/gif,image/webp"
+                   @(Model.Required ? "required" : "")
+                   onchange="previewImage(this, '@previewId')" />
+            <p class="text-xs text-gray-400 mt-1">Chấp nhận JPG, PNG, GIF, WebP. Tối đa 5MB.</p>
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Hint))
+    {
+        <p class="text-xs text-gray-400 mt-1">@Model.Hint</p>
+    }
+</div>
+
+<script>
+    function previewImage(input, previewId) {
+        var preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" class="w-full h-full object-cover" />';
+                preview.classList.remove('border-gray-300');
+                preview.classList.add('border-blue-300');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

@@ -4,8 +4,10 @@
 }
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Lịch sử thanh toán</h1>
-    <button onclick="openProcessModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Ghi nhận thanh toán</button>
+    <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-credit-card text-blue-600 mr-2"></i>Lịch sử thanh toán</h1>
+    <button onclick="openProcessModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm">
+        <i class="fas fa-plus mr-1"></i> Ghi nhận thanh toán
+    </button>
 </div>
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -36,22 +38,13 @@
             }
         </tbody>
     </table>
-    @if (Model.TotalPages > 1)
-    {
-        <div class="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
-            <span class="text-sm text-gray-500">Trang @Model.PageNumber / @Model.TotalPages</span>
-            <div class="flex gap-2">
-                @if (Model.PageNumber > 1) { <a href="?page=@(Model.PageNumber-1)" class="px-3 py-1 bg-white border rounded-md text-sm">Trước</a> }
-                @if (Model.PageNumber < Model.TotalPages) { <a href="?page=@(Model.PageNumber+1)" class="px-3 py-1 bg-white border rounded-md text-sm">Sau</a> }
-            </div>
-        </div>
-    }
+    @await Html.PartialAsync("_Pagination", Model)
 </div>
 
 <!-- Process Payment Modal -->
 <div id="processModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6">
-        <h2 class="text-lg font-bold mb-4">Ghi nhận thanh toán</h2>
+        <h2 class="text-lg font-bold mb-4"><i class="fas fa-money-bill-wave text-green-600 mr-2"></i>Ghi nhận thanh toán</h2>
         <form asp-action="Process" method="post">
             <div class="mb-3">
                 <label class="block text-sm font-medium mb-1">Mã hóa đơn (ID)</label>
@@ -74,8 +67,8 @@
                 <input name="Remark" class="w-full border rounded-md px-3 py-2" />
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeProcessModal()" class="px-4 py-2 border rounded-md text-sm">Hủy</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">Xác nhận</button>
+                <button type="button" onclick="closeProcessModal()" class="px-4 py-2 border rounded-md text-sm hover:bg-gray-50"><i class="fas fa-times mr-1"></i>Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"><i class="fas fa-check mr-1"></i>Xác nhận</button>
             </div>
         </form>
     </div>

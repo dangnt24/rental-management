@@ -1,29 +1,110 @@
 @model Rental.Application.DTOs.ContractDto
+@inject Rental.Application.Interfaces.Services.IFileService FileService
 @{
     ViewData["Title"] = "Chi tiết hợp đồng";
+    var files = await FileService.GetFilesAsync("Contract", Model.Id);
 }
 
 <div class="mb-6">
-    <a href="/Contract" class="text-blue-600 hover:text-blue-800 text-sm">&larr; Quay lại danh sách</a>
+    <a href="/Contract" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-arrow-left mr-1"></i>Quay lại danh sách</a>
 </div>
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-2xl">
-    <div class="flex justify-between items-start mb-6">
-        <h1 class="text-xl font-bold">Hợp đồng @Model.ContractCode</h1>
-        <span class="px-3 py-1 text-sm rounded-full @(Model.StatusCode == "ACTIVE" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
-            @(Model.StatusCode == "ACTIVE" ? "Hiệu lực" : "Đã kết thúc")
-        </span>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-start mb-6">
+            <h1 class="text-xl font-bold"><i class="fas fa-file-contract text-blue-600 mr-2"></i>Hợp đồng @Model.ContractCode</h1>
+            <span class="px-3 py-1 text-sm rounded-full @(Model.StatusCode == "ACTIVE" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
+                @(Model.StatusCode == "ACTIVE" ? "Hiệu lực" : "Đã kết thúc")
+            </span>
+        </div>
+        <dl class="grid grid-cols-2 gap-4">
+            <div><dt class="text-sm text-gray-500">Phòng</dt><dd class="font-medium">@Model.RoomName</dd></div>
+            <div><dt class="text-sm text-gray-500">Giá thuê thực tế</dt><dd class="font-medium">@Model.ActualRentPrice.ToString("N0") đ</dd></div>
+            <div><dt class="text-sm text-gray-500">Tiền cọc</dt><dd class="font-medium">@Model.DepositAmount.ToString("N0") đ</dd></div>
+            <div><dt class="text-sm text-gray-500">Ngày bắt đầu</dt><dd class="font-medium">@Model.StartDate.ToString("dd/MM/yyyy")</dd></div>
+            <div><dt class="text-sm text-gray-500">Ngày kết thúc</dt><dd class="font-medium">@(Model.EndDate?.ToString("dd/MM/yyyy") ?? "--")</dd></div>
+            <div><dt class="text-sm text-gray-500">Ngày tạo</dt><dd class="font-medium">@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
+        </dl>
+        @if (!string.IsNullOrEmpty(Model.Remark))
+        {
+            <div class="mt-4"><dt class="text-sm text-gray-500">Ghi chú</dt><dd class="mt-1">@Model.Remark</dd></div>
+        }
+
+        @if (Model.Tenants != null && Model.Tenants.Any())
+        {
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-3"><i class="fas fa-users text-gray-500 mr-2"></i>Người thuê</h3>
+                <div class="space-y-2">
+                    @foreach (var tenant in Model.Tenants)
+                    {
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-user text-gray-400 mr-3"></i>
+                            <span>@tenant.FullName</span>
+                            @if (tenant == Model.Tenants[0])
+                            {
+                                <span class="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Chính</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     </div>
-    <dl class="grid grid-cols-2 gap-4">
-        <div><dt class="text-sm text-gray-500">Phòng</dt><dd class="font-medium">@Model.RoomName</dd></div>
-        <div><dt class="text-sm text-gray-500">Giá thuê thực tế</dt><dd class="font-medium">@Model.ActualRentPrice.ToString("N0") đ</dd></div>
-        <div><dt class="text-sm text-gray-500">Tiền cọc</dt><dd class="font-medium">@Model.DepositAmount.ToString("N0") đ</dd></div>
-        <div><dt class="text-sm text-gray-500">Ngày bắt đầu</dt><dd class="font-medium">@Model.StartDate.ToString("dd/MM/yyyy")</dd></div>
-        <div><dt class="text-sm text-gray-500">Ngày kết thúc</dt><dd class="font-medium">@(Model.EndDate?.ToString("dd/MM/yyyy") ?? "--")</dd></div>
-        <div><dt class="text-sm text-gray-500">Ngày tạo</dt><dd class="font-medium">@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
-    </dl>
-    @if (!string.IsNullOrEmpty(Model.Remark))
-    {
-        <div class="mt-4"><dt class="text-sm text-gray-500">Ghi chú</dt><dd class="mt-1">@Model.Remark</dd></div>
-    }
+
+    <!-- File Attachments Sidebar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold mb-4 flex items-center">
+            <i class="fas fa-paperclip text-gray-500 mr-2"></i>Tệp đính kèm
+        </h3>
+        @if (files != null && files.Any())
+        {
+            <div class="space-y-3">
+                @foreach (var file in files)
+                {
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center min-w-0 flex-1">
+                            @{
+                                var isImage = file.FileType?.StartsWith("image/") == true;
+                                var iconClass = isImage ? "fa-file-image text-green-500" :
+                                    file.FileType?.Contains("pdf") == true ? "fa-file-pdf text-red-500" :
+                                    file.FileType?.Contains("word") == true || file.FileType?.Contains("document") == true ? "fa-file-word text-blue-500" :
+                                    "fa-file text-gray-500";
+                            }
+                            <i class="fas @iconClass mr-2"></i>
+                            <span class="text-sm truncate">@file.FileName</span>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0 ml-2">
+                            <a href="/File/Download/@file.Id" class="text-blue-600 hover:text-blue-800 text-sm" title="Tải xuống">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <form asp-action="DeleteFile" asp-controller="File" method="post" class="inline" onsubmit="return confirm('Xóa tệp này?')">
+                                <input type="hidden" name="id" value="@file.Id" />
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-sm text-gray-400 text-center py-4">Chưa có tệp đính kèm</p>
+        }
+
+        <!-- Upload Form -->
+        <form asp-action="UploadMultiple" asp-controller="File" method="post" enctype="multipart/form-data" class="mt-4">
+            <input type="hidden" name="tableName" value="Contract" />
+            <input type="hidden" name="refId" value="@Model.Id" />
+            @await Html.PartialAsync("_FileUploadPreview", new Rental.Web.ViewModels.FileUploadPreviewModel
+            {
+                TableName = "Contract",
+                RefId = Model.Id,
+                Label = "Tải lên tệp mới",
+                Hint = "Có thể chọn nhiều tệp cùng lúc",
+                Accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            })
+        </form>
+    </div>
 </div>

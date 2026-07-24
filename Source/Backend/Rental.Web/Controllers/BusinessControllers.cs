@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Rental.Application.DTOs;
 using Rental.Application.Interfaces.Services;
-using Rental.Core;
 
 namespace Rental.Web.Controllers
 {
@@ -20,6 +19,13 @@ namespace Rental.Web.Controllers
             ViewBag.SearchTerm = searchTerm;
             ViewBag.StatusCode = statusCode;
             ViewBag.BranchId = branchId;
+            return View(result.Data);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var result = await _roomService.GetByIdAsync(id);
+            if (!result.IsSuccess) return RedirectToAction("Index");
             return View(result.Data);
         }
 
@@ -106,11 +112,25 @@ namespace Rental.Web.Controllers
             return View(result.Data);
         }
 
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ContractDto dto)
         {
             await _contractService.CreateContractAsync(dto);
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var result = await _contractService.GetByIdAsync(id);
+            if (!result.IsSuccess) return RedirectToAction("Index");
+            return View(result.Data);
         }
 
         [HttpPost]

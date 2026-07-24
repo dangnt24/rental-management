@@ -57,7 +57,7 @@
                 {
                     foreach (var item in menuItems.OrderBy(m => m.SortOrder))
                     {
-                        var url = "/" + item.Code.ToLower();
+                        var url = "/" + item.Code.ToLower() + "/index";
                         var isActive = Context.Request.Path.StartsWithSegments(url) || 
                             (item.Code == "dashboard" && Context.Request.Path.Value == "/");
                         var icon = item.Remark ?? "circle";

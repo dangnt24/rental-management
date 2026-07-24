@@ -1,0 +1,83 @@
+@model Rental.Application.DTOs.RoomDto
+@inject Rental.Application.Interfaces.Services.IFileService FileService
+@{
+    ViewData["Title"] = "Hình ảnh phòng";
+    var images = await FileService.GetFilesAsync("Room", Model.Id);
+}
+
+<div class="mb-6">
+    <a href="/Room" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-arrow-left mr-1"></i>Quay lại danh sách</a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Room Info -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h1 class="text-xl font-bold mb-4"><i class="fas fa-door-open text-blue-600 mr-2"></i>@Model.RoomName</h1>
+        <dl class="space-y-3">
+            <div class="flex justify-between"><dt class="text-sm text-gray-500">Giá thuê</dt><dd class="font-medium">@Model.Price.ToString("N0") đ</dd></div>
+            <div class="flex justify-between"><dt class="text-sm text-gray-500">Sức chứa</dt><dd class="font-medium">@Model.MaxOccupants người</dd></div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Trạng thái</dt>
+                <dd><span class="px-2 py-1 text-xs rounded-full @(Model.StatusCode == "RENTED" ? "bg-green-100 text-green-700" : Model.StatusCode == "EMPTY" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700")">@Model.StatusCode</span></dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- Image Gallery -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+            <i class="fas fa-images text-blue-500 mr-2"></i> Hình ảnh phòng
+            <span class="ml-2 text-sm font-normal text-gray-400">(@images.Count ảnh)</span>
+        </h2>
+
+        @if (images.Any())
+        {
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                @foreach (var img in images)
+                {
+                    <div class="group relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                        <img src="/@img.FilePath.Replace("\\", "/")" alt="@img.FileName"
+                             class="w-full h-40 object-cover" />
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                            <a href="/@img.FilePath.Replace("\\", "/")" target="_blank"
+                               class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-600 hover:text-blue-800" title="Xem lớn">
+                                <i class="fas fa-expand text-xs"></i>
+                            </a>
+                            <form asp-action="DeleteFile" asp-controller="File" method="post" class="inline"
+                                  onsubmit="return confirm('Xóa ảnh này?')">
+                                <input type="hidden" name="id" value="@img.Id" />
+                                <button type="submit" class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-600 hover:text-red-800" title="Xóa">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-10 text-gray-400">
+                <i class="fas fa-image text-4xl mb-3 block"></i>
+                <p class="text-sm">Chưa có hình ảnh nào</p>
+            </div>
+        }
+
+        <!-- Upload Form -->
+        <div class="border-t pt-4">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3"><i class="fas fa-upload mr-1"></i>Thêm hình ảnh</h3>
+            <form asp-action="UploadMultiple" asp-controller="File" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="tableName" value="Room" />
+                <input type="hidden" name="refId" value="@Model.Id" />
+                @await Html.PartialAsync("_FileUploadPreview", new Rental.Web.ViewModels.FileUploadPreviewModel
+                {
+                    TableName = "Room",
+                    RefId = Model.Id,
+                    Label = "Thêm hình ảnh",
+                    Hint = "Có thể chọn nhiều ảnh cùng lúc",
+                    Accept = "image/jpeg,image/png,image/gif,image/webp"
+                })
+            </form>
+        </div>
+    </div>
+</div>

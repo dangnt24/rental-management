@@ -2,10 +2,18 @@ using System.Collections.Generic;
 
 namespace Rental.Core
 {
-    /// <summary>
-    /// Kết quả trả về chuẩn cho API.
-    /// </summary>
-    /// <typeparam name="T">Kiểu dữ liệu của nội dung trả về.</typeparam>
+    public interface IPagedResult
+    {
+        int TotalCount { get; }
+        int PageNumber { get; }
+        int PageSize { get; }
+        int TotalPages { get; }
+        bool HasPreviousPage { get; }
+        bool HasNextPage { get; }
+        int FirstItemIndex { get; }
+        int LastItemIndex { get; }
+    }
+
     public class ApiResult<T>
     {
         /// <summary>
@@ -47,32 +55,16 @@ namespace Rental.Core
     /// <summary>
     /// Kết quả trả về cho các truy vấn phân trang.
     /// </summary>
-    /// <typeparam name="T">Kiểu dữ liệu của danh sách.</typeparam>
-    public class PagedResult<T>
+    public class PagedResult<T> : IPagedResult
     {
-        /// <summary>
-        /// Danh sách dữ liệu trang hiện tại.
-        /// </summary>
-        public List<T> Items { get; set; } = new List<T>();
-
-        /// <summary>
-        /// Tổng số bản ghi thỏa mãn điều kiện.
-        /// </summary>
+        public List<T> Items { get; set; } = new();
         public int TotalCount { get; set; }
-
-        /// <summary>
-        /// Trang hiện tại.
-        /// </summary>
         public int PageNumber { get; set; }
-
-        /// <summary>
-        /// Số bản ghi trên mỗi trang.
-        /// </summary>
         public int PageSize { get; set; }
-
-        /// <summary>
-        /// Tổng số trang.
-        /// </summary>
         public int TotalPages => (int)System.Math.Ceiling((double)TotalCount / PageSize);
+        public bool HasPreviousPage => PageNumber > 1;
+        public bool HasNextPage => PageNumber < TotalPages;
+        public int FirstItemIndex => (PageNumber - 1) * PageSize + 1;
+        public int LastItemIndex => Math.Min(PageNumber * PageSize, TotalCount);
     }
 }

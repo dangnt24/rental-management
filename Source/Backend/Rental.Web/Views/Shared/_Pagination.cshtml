@@ -1,0 +1,57 @@
+@model Rental.Core.IPagedResult
+@{
+    var queryParams = Context.Request.Query.Where(q => q.Key != "page").ToList();
+    var baseUrl = Context.Request.Path;
+}
+@if (Model.TotalPages > 1)
+{
+    <div class="flex flex-wrap justify-between items-center px-4 py-3 border-t bg-gray-50 gap-3">
+        <span class="text-sm text-gray-500">
+            <i class="fas fa-list mr-1"></i>
+            @Model.FirstItemIndex–@Model.LastItemIndex / @Model.TotalCount
+        </span>
+        <div class="flex gap-1">
+            @if (Model.HasPreviousPage)
+            {
+                <a href="@baseUrl?page=1@(string.Concat(queryParams.Select(q => $"&{q.Key}={q.Value}")))"
+                   class="px-2 py-1.5 bg-white border rounded text-xs hover:bg-gray-50" title="Đầu">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="@baseUrl?page=@(Model.PageNumber-1)@(string.Concat(queryParams.Select(q => $"&{q.Key}={q.Value}")))"
+                   class="px-2 py-1.5 bg-white border rounded text-xs hover:bg-gray-50" title="Trước">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            }
+            @{
+                var startPage = Math.Max(1, Model.PageNumber - 2);
+                var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                if (startPage > 1)
+                {
+                    <span class="px-2 py-1.5 text-xs text-gray-400">...</span>
+                }
+                for (var i = startPage; i <= endPage; i++)
+                {
+                    <a href="@baseUrl?page=@i@(string.Concat(queryParams.Select(q => $"&{q.Key}={q.Value}")))"
+                       class="px-3 py-1.5 border rounded text-xs font-medium @(i == Model.PageNumber ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 hover:bg-gray-50")">
+                        @i
+                    </a>
+                }
+                if (endPage < Model.TotalPages)
+                {
+                    <span class="px-2 py-1.5 text-xs text-gray-400">...</span>
+                }
+            }
+            @if (Model.HasNextPage)
+            {
+                <a href="@baseUrl?page=@(Model.PageNumber+1)@(string.Concat(queryParams.Select(q => $"&{q.Key}={q.Value}")))"
+                   class="px-2 py-1.5 bg-white border rounded text-xs hover:bg-gray-50" title="Sau">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="@baseUrl?page=@Model.TotalPages@(string.Concat(queryParams.Select(q => $"&{q.Key}={q.Value}")))"
+                   class="px-2 py-1.5 bg-white border rounded text-xs hover:bg-gray-50" title="Cuối">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+}

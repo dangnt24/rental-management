@@ -1,0 +1,28 @@
+@model Rental.Web.ViewModels.FileUploadPreviewModel
+@{
+    var inputId = $"fu_{Model.TableName}_{Model.RefId}";
+    var listId = $"fu_list_{Model.TableName}_{Model.RefId}";
+}
+<div class="@Model.WrapperClass">
+    <label class="block text-sm font-medium mb-1">
+        <i class="fas fa-paperclip mr-1"></i>@Model.Label
+    </label>
+    <input type="file" id="@inputId" name="files" multiple
+           class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-2"
+           accept="@Model.Accept" />
+    @if (!string.IsNullOrEmpty(Model.Hint))
+    {
+        <p class="text-xs text-gray-400 mb-2">@Model.Hint</p>
+    }
+
+    <div id="@listId" class="space-y-1 mb-2"></div>
+
+    <button type="submit" class="w-full px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+        <i class="fas fa-upload mr-1"></i>Tải lên
+    </button>
+</div>
+
+<script src="~/js/file-upload-preview.js"></script>
+<script>
+    initFileUploadPreview('@inputId', '@listId');
+</script>

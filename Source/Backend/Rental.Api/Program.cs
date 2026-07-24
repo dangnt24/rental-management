@@ -12,6 +12,9 @@ using Rental.Persistence.UnitOfWork;
 using Rental.Security.Jwt;
 using Rental.Security.Password;
 using System.Text;
+using Npgsql;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 

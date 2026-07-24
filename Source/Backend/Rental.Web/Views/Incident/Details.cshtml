@@ -1,0 +1,124 @@
+@model Rental.Application.DTOs.IncidentDto
+@inject Rental.Application.Interfaces.Services.IFileService FileService
+@{
+    ViewData["Title"] = "Chi tiết sự cố";
+    var files = await FileService.GetFilesAsync("Incident", Model.Id);
+}
+
+<div class="mb-6">
+    <a href="/Incident" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-arrow-left mr-1"></i>Quay lại danh sách</a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Incident Info -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-start mb-6">
+            <h1 class="text-xl font-bold"><i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>Chi tiết sự cố</h1>
+            <span class="px-3 py-1 text-sm rounded-full @(Model.StatusCode == "RESOLVED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700")">
+                @(Model.StatusCode == "RESOLVED" ? "Đã xử lý" : "Đang chờ")
+            </span>
+        </div>
+        <dl class="grid grid-cols-2 gap-4">
+            <div><dt class="text-sm text-gray-500">Phòng</dt><dd class="font-medium">@Model.RoomName</dd></div>
+            <div><dt class="text-sm text-gray-500">Mức độ</dt>
+                <dd>
+                    <span class="px-2 py-1 text-xs rounded-full @(Model.PriorityCode == "HIGH" ? "bg-red-100 text-red-700" : Model.PriorityCode == "MEDIUM" ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700")">
+                        @(Model.PriorityCode == "HIGH" ? "Cao" : Model.PriorityCode == "MEDIUM" ? "Trung bình" : "Thấp")
+                    </span>
+                </dd>
+            </div>
+            <div class="col-span-2"><dt class="text-sm text-gray-500">Mô tả</dt><dd class="mt-1">@Model.Description</dd></div>
+            <div><dt class="text-sm text-gray-500">Ngày báo</dt><dd class="font-medium">@Model.ReportedDate.ToString("dd/MM/yyyy HH:mm")</dd></div>
+            <div><dt class="text-sm text-gray-500">Chi phí sửa chữa</dt><dd class="font-medium">@Model.RepairCost.ToString("N0") đ</dd></div>
+            @if (Model.ResolvedDate.HasValue)
+            {
+                <div><dt class="text-sm text-gray-500">Ngày xử lý</dt><dd class="font-medium">@Model.ResolvedDate.Value.ToString("dd/MM/yyyy HH:mm")</dd></div>
+            }
+        </dl>
+
+        @if (Model.StatusCode != "RESOLVED")
+        {
+            <form asp-action="Update" method="post" class="mt-6 pt-4 border-t">
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="RoomId" value="@Model.RoomId" />
+                <input type="hidden" name="TenantId" value="@Model.TenantId" />
+                <input type="hidden" name="Description" value="@Model.Description" />
+                <input type="hidden" name="PriorityCode" value="@Model.PriorityCode" />
+                <input type="hidden" name="StatusCode" value="RESOLVED" />
+                <input type="hidden" name="RepairCost" value="@Model.RepairCost" />
+                <input type="hidden" name="ReportedDate" value="@Model.ReportedDate.ToString("o")" />
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
+                    <i class="fas fa-check-circle mr-1"></i>Xác nhận đã xử lý
+                </button>
+            </form>
+        }
+    </div>
+
+    <!-- Evidence Images -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold mb-4 flex items-center">
+            <i class="fas fa-camera text-gray-500 mr-2"></i>Hình ảnh
+            <span class="ml-2 text-sm font-normal text-gray-400">(@files.Count ảnh)</span>
+        </h3>
+
+        @if (files.Any())
+        {
+            <div class="space-y-3">
+                @foreach (var file in files)
+                {
+                    var isImage = file.FileType?.StartsWith("image/") == true;
+                    if (isImage)
+                    {
+                        <div class="group relative rounded-lg overflow-hidden border border-gray-200">
+                            <img src="/@file.FilePath.Replace("\\", "/")" alt="@file.FileName"
+                                 class="w-full h-32 object-cover" />
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                                <a href="/@file.FilePath.Replace("\\", "/")" target="_blank"
+                                   class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-600" title="Xem lớn">
+                                    <i class="fas fa-expand text-xs"></i>
+                                </a>
+                                <form asp-action="DeleteFile" asp-controller="File" method="post" class="inline"
+                                      onsubmit="return confirm('Xóa hình ảnh này?')">
+                                    <input type="hidden" name="id" value="@file.Id" />
+                                    <button type="submit" class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-600" title="Xóa">
+                                        <i class="fas fa-trash text-xs"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center min-w-0 flex-1">
+                                <i class="fas fa-file text-gray-500 mr-2"></i>
+                                <span class="text-sm truncate">@file.FileName</span>
+                            </div>
+                            <a href="/File/Download/@file.Id" class="text-blue-600 hover:text-blue-800 text-sm ml-2">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-sm text-gray-400 text-center py-6">Chưa có hình ảnh</p>
+        }
+
+        <!-- Upload -->
+        <form asp-action="UploadMultiple" asp-controller="File" method="post" enctype="multipart/form-data" class="mt-4 pt-4 border-t">
+            <input type="hidden" name="tableName" value="Incident" />
+            <input type="hidden" name="refId" value="@Model.Id" />
+            @await Html.PartialAsync("_FileUploadPreview", new Rental.Web.ViewModels.FileUploadPreviewModel
+            {
+                TableName = "Incident",
+                RefId = Model.Id,
+                Label = "Thêm hình ảnh",
+                Hint = "Có thể chọn nhiều ảnh cùng lúc",
+                Accept = "image/jpeg,image/png,image/gif,image/webp"
+            })
+        </form>
+    </div>
+</div>

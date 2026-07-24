@@ -130,7 +130,7 @@ namespace Rental.Persistence
         private void NormalizeDateTimesToUtc()
         {
             var entries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+                .Where(e => e.State == EntityState.Added);
 
             foreach (var entry in entries)
             {
@@ -141,7 +141,9 @@ namespace Rental.Persistence
                         var value = (DateTime?)property.GetValue(entry.Entity);
                         if (value.HasValue && value.Value.Kind != DateTimeKind.Utc)
                         {
-                            property.SetValue(entry.Entity, DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
+                            var utc = DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+                            if (utc != value.Value)
+                                property.SetValue(entry.Entity, utc);
                         }
                     }
                     else if (property.PropertyType == typeof(DateTime?))
@@ -149,7 +151,9 @@ namespace Rental.Persistence
                         var value = (DateTime?)property.GetValue(entry.Entity);
                         if (value.HasValue && value.Value.Kind != DateTimeKind.Utc)
                         {
-                            property.SetValue(entry.Entity, DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
+                            var utc = DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+                            if (utc != value.Value)
+                                property.SetValue(entry.Entity, utc);
                         }
                     }
                 }

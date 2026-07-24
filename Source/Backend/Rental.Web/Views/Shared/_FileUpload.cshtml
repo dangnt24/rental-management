@@ -1,0 +1,52 @@
+@model Rental.Web.ViewModels.FileUploadModel
+@{
+    var acceptAttr = string.Join(",", Model.AllowedExtensions.Select(e => e.StartsWith(".") ? e : "." + e));
+    var inputId = $"file_{Model.Name}_{Guid.NewGuid():N}";
+}
+<div class="@(Model.WrapperClass)">
+    @if (!string.IsNullOrEmpty(Model.Label))
+    {
+        <label for="@inputId" class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-paperclip mr-1"></i>@Model.Label
+        </label>
+    }
+    @if (!string.IsNullOrEmpty(Model.Hint))
+    {
+        <p class="text-xs text-gray-400 mb-2">@Model.Hint</p>
+    }
+    <div class="flex items-center gap-3">
+        <label for="@inputId"
+               class="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 transition">
+            <i class="fas fa-upload mr-2"></i>
+            <span>@(Model.ButtonText ?? "Chọn tệp")</span>
+        </label>
+        <span id="@(inputId)_name" class="text-sm text-gray-400 truncate max-w-xs">@(Model.SelectedFileName ?? "Chưa chọn tệp")</span>
+        @if (!string.IsNullOrEmpty(Model.ExistingFilePath))
+        {
+            <a href="@Model.ExistingFilePath" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm" title="Tải xuống">
+                <i class="fas fa-download"></i>
+            </a>
+        }
+    </div>
+    <input type="file" id="@inputId"
+           name="@Model.Name"
+           class="hidden"
+           accept="@acceptAttr"
+           @(Model.Required ? "required" : "")
+           onchange="document.getElementById('@(inputId)_name').textContent = this.files[0]?.name || 'Chưa chọn tệp'" />
+    @if (!string.IsNullOrEmpty(Model.PreviewUrl))
+    {
+        <div class="mt-2">
+            @if (Model.IsImage)
+            {
+                <img src="@Model.PreviewUrl" alt="Preview" class="max-w-xs rounded border" />
+            }
+            else
+            {
+                <a href="@Model.PreviewUrl" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline">
+                    <i class="fas fa-external-link-alt mr-1"></i>Xem tệp hiện tại
+                </a>
+            }
+        </div>
+    }
+</div>
