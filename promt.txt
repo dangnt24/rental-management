@@ -1,0 +1,42 @@
+Tôi đang xây dựng một hệ thống quản lý nhà trọ theo hướng có thể mở rộng thành platform (core system) sử dụng các công nghệ sau:
+
+* Backend: ASP.NET Core Web API (.NET 8)
+* ORM: Entity Framework Core
+* Database: PostgreSQL
+* Auth: JWT
+* Frontend: React + Vite + TailwindCSS
+* DevOps: Git, Docker (chưa làm tới)
+
+Hiện tại tôi đã làm được:
+
+* Thiết kế database đầy đủ cho hệ thống (Rooms, Tenants, Contracts, Invoices, FeeTypes, Payments, Maintenance, Notifications, Users, Roles, Permissions, Menu, Common Data, Localization)
+* Đã tạo database PostgreSQL và seed data
+* Đã tạo Entity C# tương ứng
+* Đã cấu hình DbContext
+* Đã setup JWT authentication
+* Đã setup BCrypt để hash password
+* Đã tạo API Login
+* Đã tạo CRUD cơ bản cho Room và Tenant
+* Đã fix lỗi package (EF Core 8, Npgsql, JWT)
+
+Hiện tại backend có thể build và chạy.
+
+Mục tiêu của tôi:
+
+* Xây dựng hệ thống chuẩn production (clean, scalable)
+* Có phân quyền (Role + Permission)
+* Menu động theo quyền
+* Hỗ trợ đa ngôn ngữ (vi/en)
+* Có thể mở rộng thêm module sau này
+
+Hãy đóng vai một senior .NET developer và hướng dẫn tôi từng bước tiếp theo theo đúng best practice.
+
+Ưu tiên tiếp theo tôi muốn làm:
+
+1. Hoàn thiện CRUD chuẩn (pagination, filter, search)
+2. Xây dựng phân quyền Role + Permission (RBAC)
+3. Dynamic menu theo DB
+4. Generate invoice tự động theo tháng
+5. Upload file (ảnh phòng, CCCD)
+
+Hãy hướng dẫn chi tiết từng bước, có code mẫu rõ ràng và giải thích lý do thiết kế.

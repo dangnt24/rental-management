@@ -1,0 +1,9 @@
+- Sửa phân trang dạng nút <<, <, 1, 2, 3, ..., 9, 10, 11, >, >> nếu mà nhỏ hơn 7 phần tử thì hiển thị đầy đủ luôn không hiện ... và phân trang này là phân trang theo backend nha không phân bằng font-end
+- các nút sửa, xoá thêm icon phù hợp
+- Viết cho tôi các control common 
+control combobox thì nó có khả năng render động theo dữ liệu database có lazy loading, 
+- Control upload ảnh có validate dung lương tối data định dạng được phép upload theo loại image hoặc file, được phép upload nhiều hay không có hiển thị preview lên đối với control upload hình hay không. Hoặc làm 2 control 1 cái upload file (được chọn nhiều hoặc 1), 1 control ảnh chỉ up 1 hình 
+-  Thiết kế database và lại chỗ bảng sy_file_attachments thì khi bảng ms_rooms up hình thì nó sẽ gọi hàm common để Move hình vào thư mục C:\Projects\Rental_Managemet\File_Attachments\ten_man_hình và có thể chuyển nhiều file sau đó thì lưu thông tin file ở sy_file_attachments và chỉ lưu file_group_key ở các cột của bảng ms_rooms,ms_tenants để mapping qua bảng sy_file_attachments bằng file_group_key sau đó trong code khi select lên thì sẽ dùng hàm GetFileInfo để lấy group hình ảnh có thông tin đầy đủ và đưa vào model kiểu FileInfo
+=> Sẽ thêm cột ms_rooms.images và cột ms_tenants.avatar để lưu file_group_key nên hãy tạo cho tôi script update vào .sql để tôi chạy, tương tự chỗ nào cần sửa DB thì cũng đưa vào file đó luôn để tôi chạy
+- Tương tự bản hợp đồng được phép up file mà tôi chưa thấy cho phép upload hợp đồng, và nhấn tạo hợp đồng thì nó đang lỗi 405 https://localhost:55582/Contract/Create 
+- Cấu trúc source đang lộn xộn sắp xếp lại cho clear và xoá nhưng cái không cần thiết đi

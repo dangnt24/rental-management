@@ -1,7 +1,8 @@
 (function() {
     var stores = {};
 
-    window.initFileUploadPreview = function(inputId, listId) {
+    window.initFileUploadPreview = function (inputId, listId) {
+        debugger;
         stores[inputId] = [];
         var input = document.getElementById(inputId);
         if (!input) return;

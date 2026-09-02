@@ -1,0 +1,55 @@
+Tôi đang xây dựng một project **Fullstack quản lý phòng trọ (Rental Management System)** với mục tiêu làm production-level để đưa vào CV.
+
+Thông tin của tôi:
+
+* Tôi đang dùng Windows
+* Tôi là dev .NET (khoảng 1 năm kinh nghiệm)
+* Tôi đang học và làm lần đầu với React, Docker và CI/CD
+* Tôi muốn mọi thứ đơn giản, dễ hiểu, từng bước rõ ràng
+
+Tech stack tôi muốn sử dụng:
+
+* Backend: ASP.NET Core Web API (.NET 8)
+* ORM: Entity Framework Core
+* Database: PostgreSQL
+* Auth: JWT
+* Frontend: React + Vite + TailwindCSS
+* DevOps: Git, Docker, GitHub Actions (CI/CD)
+
+Hiện tại tôi đã:
+
+* Tạo được ASP.NET Core Web API
+* Kết nối PostgreSQL
+* Tạo DbContext
+* Chạy migration thành công
+* Có bảng Room trong database
+
+Mục tiêu của tôi:
+
+* Xây dựng một hệ thống quản lý phòng trọ hoàn chỉnh có thể deploy thật
+* Code theo hướng clean architecture, dễ hiểu, giống production
+* Làm từng bước từ backend → frontend → deploy → CI/CD
+
+Yêu cầu bạn:
+
+1. Hướng dẫn tôi từng bước rõ ràng, không nhảy bước
+2. Mỗi bước giải thích ngắn gọn, dễ hiểu
+3. Ưu tiên best practice nhưng không quá phức tạp
+4. Code phải clean, dễ đọc, phù hợp với người mới
+5. Sau mỗi bước, hãy nói rõ tôi cần làm gì tiếp theo
+6. Nếu có lỗi thường gặp thì nhắc trước
+
+Hãy bắt đầu từ bước tiếp theo của tôi:
+👉 Tạo CRUD API cho Room (Controller + Service + Repository nếu cần)
+👉 Test bằng Swagger
+
+Sau đó tiếp tục guide tôi:
+
+* Authentication JWT
+* Thiết kế database đầy đủ cho hệ thống quản lý trọ
+* Kết nối frontend React
+* Dockerize project
+* CI/CD với GitHub Actions
+* Deploy lên VPS hoặc platform free
+
+Hãy đóng vai một senior .NET developer và hướng dẫn tôi như mentor 1-1.

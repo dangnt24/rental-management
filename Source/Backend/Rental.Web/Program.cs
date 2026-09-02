@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Rental.Application.Interfaces.Persistence;
 using Rental.Application.Interfaces.Services;
 using Rental.Application.Mappings;
@@ -6,8 +7,6 @@ using Rental.Persistence;
 using Rental.Persistence.UnitOfWork;
 using Rental.Security.Jwt;
 using Rental.Security.Password;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

@@ -13,8 +13,6 @@
     <ProjectReference Include="..\Rental.Security\Rental.Security.csproj" />
     <ProjectReference Include="..\Rental.Domain\Rental.Domain.csproj" />
     <ProjectReference Include="..\Rental.Core\Rental.Core.csproj" />
-    <ProjectReference Include="..\Rental.Shared\Rental.Shared.csproj" />
-    <ProjectReference Include="..\Rental.Validation\Rental.Validation.csproj" />
     <ProjectReference Include="..\Rental.Caching\Rental.Caching.csproj" />
     <ProjectReference Include="..\Rental.Localization\Rental.Localization.csproj" />
   </ItemGroup>
