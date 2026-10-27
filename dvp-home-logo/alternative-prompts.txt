@@ -1,0 +1,25 @@
+Mode: built-in image_gen
+
+Alternative 1 (logo 2)
+Use case: logo-brand
+Asset type: professional logo for rental property management website, brand "DVP Home".
+Create ONE distinctive alternative logo. Quiet luxury, human-designed restraint, precise typography. Direction: compact custom DVP monogram on the left, exact wordmark "DVP Home" on the right. Build a beautiful, simple D/P ligature with a subtle V-shaped negative space, at most 3 clear geometric strokes; the emblem must be elegant and easy to recognize at small sizes. No roof, doorway or house silhouette. Pair the emblem with an expertly kerned medium-weight contemporary sans serif wordmark, understated and highly readable. Palette: midnight navy with one small matte champagne accent, flat solid colors only.
+Single horizontal logo lockup on true transparent alpha background, wide canvas, logo fills canvas with modest clear space. Exact text: "DVP Home". No other text.
+Avoid: mockup, presentation board, multiple logos, descriptions, crowns, laurels, shields, ornate luxury crests, generic real-estate clipart, gradients, shading, textures, metallic effect, 3D, shadows, glow, hairline strokes, watermarks. Crisp vector-like edges. This must feel like a carefully crafted credible brand identity, not AI decoration.
+
+Alternative 2 (logo 3)
+Use case: logo-brand
+Asset type: logo for Vietnamese rental property management website, "DVP Home".
+Create ONE refined alternative brand logo, architectural and inviting, boutique hospitality quality. Simple geometric emblem at the left: two offset architectural rectangular volumes that define a welcoming open courtyard in negative space. Just 3 or 4 confident medium-weight strokes, compact and memorable. Avoid a conventional peaked roof. To the right, exact text "DVP Home" in a sophisticated, elegantly proportioned serif with sturdy readable letterforms and meticulous spacing; DVP and Home on one baseline. Deliberately understated human design, balanced proportions.
+Color palette: warm charcoal lettering and muted clay/terracotta emblem, all FLAT solid colors. True transparent alpha background, no colored backdrop. Single horizontal lockup, wide canvas with modest clear space, usable website logo.
+Exact text: "DVP Home", no other words.
+Avoid: mockups, multiple logos, labels, slogans, clipart house, key, skyline, thin fragile lines, decorative flourishes, crests, crowns, gradients, shading, metallic effects, textures, shadows, 3D, glow, watermark. Clean vector-like edges, excellent small-size legibility, restrained and professional.
+
+Alternative 3 (logo 4)
+Use case: logo-brand
+Asset type: minimalist premium typographic logo for a Vietnamese rental property management website.
+Create ONE masterfully typeset logo for exact brand name "DVP Home". Direction: pure typographic wordmark, no separate symbol. DVP in custom-drawn contemporary medium-weight serif capitals, distinctive subtly connected V/P junction and beautiful restrained proportions; Home in a lighter but still readable complementary humanist sans serif. Both parts on one baseline, with deliberate balanced spacing. Add just one very small muted brass square after the word Home, a subtle architectural punctuation detail, not a period character. Human-designed editorial sophistication, quiet confidence, welcoming and enduring. Different from generic luxury property logos, highly readable at website header sizes.
+Palette: flat espresso-brown lettering, tiny muted brass square. No bevel, shine, gradient, texture or metallic effect.
+Composition: single horizontal wordmark on genuine transparent alpha background, wide canvas, fills canvas with modest clear space, clean crisp vector-like edges.
+Exact text: "DVP Home". No slogans, no labels, no extra text.
+Avoid: houses, roofs, keys, doors, buildings, separate monogram emblem, crowns, ornaments, laurels, crests, illustrations, calligraphy, ultra-thin hairlines, shadows, 3D, glow, mockup, presentation sheet, watermark, multiple options. Make the craftsmanship come from typography and spacing alone.

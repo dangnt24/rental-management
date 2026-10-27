@@ -1,0 +1,10 @@
+Mode: built-in image_gen
+
+Use case: logo-brand
+Asset type: final logo for a Vietnamese rental property management website, brand "DVP Home".
+Primary request: Design one refined, credible, professionally art-directed logo that feels crafted by a human identity designer. Quiet luxury, warm hospitality, architectural precision, trustworthy property management.
+Design: one original, very simple architectural emblem at the left, using a doorway and subtle D/V-inspired negative space in a compact geometric shape, paired with the exact wordmark "DVP Home" to the right. Do not force all three initials into the emblem. Strong clear silhouette, optical balance and carefully considered kerning. Wordmark DVP in a sophisticated medium-weight contemporary serif, Home in a complementary understated type style, aligned elegantly on the same baseline. Excellent legibility for a website navigation bar. Restrained, confident, timeless rather than ornate.
+Color palette: near-black deep forest green with at most one small muted antique-brass accent; flat solid colors.
+Composition: single horizontal lockup, centered, transparent background, tightly composed with sensible clear space. Logo fills most of a wide image canvas. Deliver the actual usable logo asset, not a presentation sheet.
+Text (verbatim): "DVP Home". D V P space H o m e. No other text.
+Constraints: clean vector-like edges, minimal shapes, reproducible in one color, no ultra-thin hairlines, no photorealism, no 3D, no mockup, no textures, no shadows, no gradients, no gold foil, no glow, no generic roof-and-key clipart, no skyline, no laurels, no crowns, no stock luxury crest, no decorative flourishes, no watermark, no labels. Genuine transparent alpha background.
