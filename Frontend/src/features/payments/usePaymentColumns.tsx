@@ -1,4 +1,4 @@
-import { Paperclip } from "lucide-react";
+import { Paperclip, Eye } from "lucide-react";
 import type { Column } from "../../shared/types";
 import { money, date, code } from "../../shared/formatters";
 import { labels } from "../../shared/labels";
@@ -6,7 +6,7 @@ import { IconButton } from "../../shared/components/IconButton";
 import { useWorkspace } from "../../app/WorkspaceContext";
 
 export function usePaymentColumns() {
-  const { contractRoom, all, attach } = useWorkspace();
+  const { contractRoom, all, attach, setPaymentDetail } = useWorkspace();
   const paymentColumns: Column[] = [
     { label: "Ngày thu", cell: (r) => date(r.paidDate) },
     {
@@ -31,12 +31,20 @@ export function usePaymentColumns() {
     {
       label: "",
       cell: (r) => (
-        <IconButton
-          title="Chứng từ"
-          onClick={() => attach("payment", r, "Chứng từ thanh toán")}
-        >
-          <Paperclip size={16} />
-        </IconButton>
+        <div className="row-actions">
+          <IconButton
+            title="Xem chi tiết thanh toán"
+            onClick={() => setPaymentDetail(r)}
+          >
+            <Eye size={16} />
+          </IconButton>
+          <IconButton
+            title="Chứng từ"
+            onClick={() => attach("payment", r, "Chứng từ thanh toán")}
+          >
+            <Paperclip size={16} />
+          </IconButton>
+        </div>
       ),
     },
   ];

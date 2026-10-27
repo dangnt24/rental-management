@@ -1,8 +1,11 @@
-param([switch]$SkipBuild, [switch]$NoBrowser, [ValidateRange(1, 65535)][int]$Port = 5247)
+param([switch]$SkipBuild, [switch]$NoBrowser, [switch]$Restart, [ValidateRange(1, 65535)][int]$Port = 5247)
 $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
 $url = "http://localhost:$Port"
+$toolDirectory = Join-Path $projectRoot '.tools'
+$runtimeRoot = [System.IO.Path]::GetFullPath((Join-Path $toolDirectory 'runtime'))
+$lastBuildFile = Join-Path $toolDirectory 'last-build.json'
 
 # Mo lai launcher khong build de len assembly cua website dang chay.
 $existingHealth = $null
@@ -14,20 +17,39 @@ if ($existingHealth -and $existingHealth.status -eq 'ok') {
         if ($existingHealth.database -ne 'PostgreSQL') {
             throw 'Website dang chay ban cu. Ban hien tai chi dung PostgreSQL. Nhan Ctrl+C trong cua so dang chay website, sau do chay lai Start.cmd.'
         }
-        Write-Host "Website da dang chay tai $url ($($existingHealth.database))."
-        Write-Host 'Khong can build hay mo them server. Neu vua sua code/cau hinh, dung cua so cu bang Ctrl+C roi chay lai.'
-        if (-not $NoBrowser) { Start-Process $url -WindowStyle Hidden }
-        return
+        if (-not $Restart) {
+            Write-Host "Website da dang chay tai $url ($($existingHealth.database))."
+            Write-Host 'Neu vua sua code/UI: chay Restart.cmd de dung web, build lai va mo ban moi.'
+            if (-not $NoBrowser) { Start-Process $url }
+            return
+        }
     }
 }
 $listeners = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
+if ($Restart -and ($listeners | Where-Object { $_.Port -eq $Port })) {
+    if (-not (Test-Path -LiteralPath $lastBuildFile)) { throw 'Khong co thong tin ban build de xac minh server. Hay Ctrl+C o cua so web cu roi chay lai.' }
+    $restartDll = [System.IO.Path]::GetFullPath((Get-Content -LiteralPath $lastBuildFile -Raw | ConvertFrom-Json).AppDll)
+    if (-not $restartDll.StartsWith($runtimeRoot + '\', [StringComparison]::OrdinalIgnoreCase) -or
+        [System.IO.Path]::GetFileName($restartDll) -ne 'Rental.Api.dll') { throw 'Duong dan server da luu khong hop le; khong dung tien trinh.' }
+    $urlPattern = '--urls\s+"?' + [regex]::Escape($url) + '(?:"|\s|$)'
+    $webProcesses = @(Get-CimInstance Win32_Process -Filter "Name='dotnet.exe'" | Where-Object {
+        $_.CommandLine -and $_.CommandLine.IndexOf($restartDll, [StringComparison]::OrdinalIgnoreCase) -ge 0 -and $_.CommandLine -match $urlPattern
+    })
+    if ($webProcesses.Count -ne 1) { throw "Khong xac minh duoc dung server DVP Home tren cong $Port; khong dung tien trinh khac. Hay Ctrl+C o cua so web cu." }
+    Write-Host "Dang dung DVP Home tren cong $Port de build lai..."
+    Stop-Process -Id $webProcesses[0].ProcessId -ErrorAction Stop
+    Wait-Process -Id $webProcesses[0].ProcessId -Timeout 10 -ErrorAction SilentlyContinue
+    # Tien trinh da thoat nhung Windows co the chua nha socket ngay.
+    for ($releaseAttempt = 0; $releaseAttempt -lt 50; $releaseAttempt++) {
+        $listeners = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
+        if (-not ($listeners | Where-Object { $_.Port -eq $Port })) { break }
+        Start-Sleep -Milliseconds 100
+    }
+}
 if ($listeners | Where-Object { $_.Port -eq $Port }) {
     throw "Cong $Port dang duoc su dung. Cho website khoi dong xong roi thu lai, hoac chay Start.ps1 -Port 5248."
 }
-$toolDirectory = Join-Path $projectRoot '.tools'
 New-Item -ItemType Directory -Path $toolDirectory -Force | Out-Null
-$runtimeRoot = [System.IO.Path]::GetFullPath((Join-Path $toolDirectory 'runtime'))
-$lastBuildFile = Join-Path $toolDirectory 'last-build.json'
 $appDllPath = Join-Path $projectRoot 'Rental.Api\bin\Debug\net8.0\Rental.Api.dll'
 $env:DOTNET_CLI_HOME = Join-Path $toolDirectory 'cli-home'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
@@ -110,7 +132,23 @@ $env:ASPNETCORE_ENVIRONMENT = 'Development'
 Write-Host "`nDVP HOME - $url"
 Write-Host 'Demo: admin / Demo@123456 | manager / Demo@123456'
 Write-Host 'Du lieu duoc giu lai. Ctrl+C de dung. Xem /api/health de kiem tra database dang dung.'
-if (-not $NoBrowser) { Start-Process $url -WindowStyle Hidden }
+if (-not $NoBrowser) {
+    # Mo trinh duyet sau khi API san sang, tranh tab trang/connection refused luc khoi dong.
+    $browserScript = @"
+for (`$attempt = 0; `$attempt -lt 60; `$attempt++) {
+    try {
+        `$health = Invoke-RestMethod '$url/api/health' -TimeoutSec 1
+        if (`$health.application -eq 'RentalManagement' -and `$health.status -eq 'ok') {
+            Start-Process '$url'
+            exit
+        }
+    } catch { }
+    Start-Sleep -Milliseconds 500
+}
+"@
+    $encodedBrowserScript = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($browserScript))
+    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @('-NoProfile', '-EncodedCommand', $encodedBrowserScript)
+}
 Push-Location -LiteralPath (Join-Path $projectRoot 'Rental.Api')
 try {
     & $dotnetExe $appDllPath --urls $url

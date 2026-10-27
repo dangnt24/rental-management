@@ -8,6 +8,9 @@ export type User = {
   username: string;
   fullName: string;
   role: "Owner" | "Manager" | "Tenant";
+  email?: string;
+  phone?: string;
+  avatarUrl?: string | null;
 };
 
 export type Page =
@@ -18,6 +21,7 @@ export type Page =
   | "billing"
   | "payments"
   | "incidents"
+  | "accounts"
   | "settings";
 
 export type Option = { value: string | number; label: string };
@@ -32,12 +36,21 @@ export type Field = {
   max?: number;
   step?: string;
   hint?: string;
+  section?: string;
+  valueType?: "number" | "string";
   visible?: (values: Row) => boolean;
 };
 
 export type FormDefinition = {
   title: string;
+  wide?: boolean;
   description?: string;
+  confirmation?: {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    danger?: boolean;
+  };
   fields: Field[];
   initial: Row;
   submit: (values: Row) => Promise<unknown>;

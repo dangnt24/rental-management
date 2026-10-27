@@ -1,5 +1,17 @@
 {
-  "name": "rental-management-checks", "private": true, "type": "module",
-  "scripts": { "test": "node postgres-test.mjs", "test:postgres": "node postgres-test.mjs" },
-  "devDependencies": { "@electric-sql/pglite": "0.5.11", "@electric-sql/pglite-socket": "0.2.14", "prettier": "3.5.3" }
+  "name": "rental-management-checks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node postgres-test.mjs",
+    "test:postgres": "node postgres-test.mjs",
+    "test:photos": "node photo-viewport-test.mjs",
+    "sample:cantho": "node generate-can-tho-sample.mjs",
+    "test:cantho": "node can-tho-sample-test.mjs --api"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "@electric-sql/pglite-socket": "0.2.14",
+    "prettier": "3.5.3"
+  }
 }

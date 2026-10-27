@@ -9,6 +9,7 @@ namespace Rental.Api.Features.Accounts;
 /// <summary>Tài khoản và phân quyền; thao tác ghi dùng giao dịch chung của endpoint filter.</summary>
 public sealed class UserService(RentalDb database, IHttpContextAccessor accessor) : FeatureService(database, accessor)
 {
+    public static object View(User user) => new { user.Id, user.Username, user.FullName, user.Role, user.Email, user.Phone, AvatarUrl = user.AvatarStoredName.Length > 0 ? $"/api/auth/avatar/{user.Id}?v={user.AvatarVersion}" : null };
     public async Task<object> UpsertUser(int? id, UserRequest r)
     {
         OwnerOnly();
@@ -27,6 +28,18 @@ public sealed class UserService(RentalDb database, IHttpContextAccessor accessor
         }
         entity.Username = Text(r.Username, "Tên đăng nhập", 50).ToLowerInvariant();
         entity.FullName = Text(r.FullName, "Họ tên", 100);
+        if (r.Email != null)
+        {
+            var email = Text(r.Email, "Email", 254, false).ToLowerInvariant();
+            Require(email.Length == 0 || System.Net.Mail.MailAddress.TryCreate(email, out var parsed) && parsed.Address == email, "Email không hợp lệ.");
+            entity.Email = email;
+        }
+        if (r.Phone != null)
+        {
+            var phone = Text(r.Phone, "Số điện thoại", 20, false);
+            Require(phone == entity.Phone || phone.Length == 0 || System.Text.RegularExpressions.Regex.IsMatch(phone, @"^\+?[0-9][0-9 .()\-]{6,19}$"), "Số điện thoại không hợp lệ.");
+            entity.Phone = phone;
+        }
         entity.Role = r.Role;
         entity.TenantId = tenantId;
         entity.IsActive = r.IsActive;

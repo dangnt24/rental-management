@@ -3,6 +3,7 @@ import { EditForm } from "../shared/components/EditForm";
 import { AttachmentModal } from "../features/attachments/AttachmentModal";
 import { useWorkspace } from "./WorkspaceContext";
 import { InvoiceDialog } from "../features/billing/InvoiceDialog";
+import { PaymentDialog } from "../features/payments/PaymentDialog";
 
 export function WorkspaceDialogs() {
   const {
@@ -45,6 +46,7 @@ export function WorkspaceDialogs() {
         />
       )}
       <InvoiceDialog />
+      <PaymentDialog />
     </>
   );
 }

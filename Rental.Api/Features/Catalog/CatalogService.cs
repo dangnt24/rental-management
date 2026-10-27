@@ -39,9 +39,13 @@ public sealed class CatalogService(RentalDb db)
             Rooms = await query.Select(r => new
             {
                 r.Id, r.BranchId, r.Name, r.Price, r.Capacity, r.Description,
+                r.Area, r.Floor, r.RoomType, r.Amenities, r.AmenitiesConfirmed, r.ToiletType, r.AccessHours,
+                r.LaundryType, r.ParkingType, r.MaxVehicles, r.PetsAllowed, r.ElectricVehiclesAllowed,
+                r.HasWindow, r.HasBalcony, r.SuggestedDeposit, r.MinimumLeaseMonths, r.Neighborhood,
+                r.RentalConditions, r.ContactName, r.ContactPhone,
                 Branch = db.Branches.Where(b => b.Id == r.BranchId).Select(b => new { b.Name, b.Address }).Single(),
-                Photos = db.Attachments.Where(a => a.EntityType == "room" && a.EntityId == r.Id && a.IsPublic && (a.ContentType == "image/jpeg" || a.ContentType == "image/png"))
-                    .OrderBy(a => a.Id).Select(a => new { a.Id }).ToList(),
+                Photos = db.Attachments.Where(a => !a.IsArchived && a.EntityType == "room" && a.EntityId == r.Id && a.IsPublic && (a.ContentType == "image/jpeg" || a.ContentType == "image/png"))
+                    .OrderBy(a => a.SortOrder).ThenBy(a => a.Id).Select(a => new { a.Id, a.SortOrder }).ToList(),
                 Fees = db.Fees.Where(f => f.BranchId == r.BranchId && !f.IsArchived).Select(f => new { f.Name, f.Method, f.UnitPrice }).ToList()
             }).ToListAsync()
         };
@@ -50,7 +54,7 @@ public sealed class CatalogService(RentalDb db)
     public async Task<Attachment> Photo(int roomId, int id)
     {
         Require(await AvailableRooms().AnyAsync(r => r.Id == roomId), "Phòng không còn được đăng cho thuê.", 404);
-        return await db.Attachments.AsNoTracking().SingleOrDefaultAsync(a => a.Id == id && a.EntityId == roomId && a.EntityType == "room" && a.IsPublic && (a.ContentType == "image/jpeg" || a.ContentType == "image/png"))
+        return await db.Attachments.AsNoTracking().SingleOrDefaultAsync(a => !a.IsArchived && a.Id == id && a.EntityId == roomId && a.EntityType == "room" && a.IsPublic && (a.ContentType == "image/jpeg" || a.ContentType == "image/png"))
             ?? throw new BusinessError("Không tìm thấy ảnh công khai.", 404);
     }
 }

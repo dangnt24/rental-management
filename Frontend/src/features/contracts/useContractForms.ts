@@ -78,6 +78,13 @@ export function useContractForms() {
   function closeContract(row: Row) {
     setForm({
       title: "Trả phòng & quyết toán cọc",
+      confirmation: {
+        title: "Xác nhận trả phòng và quyết toán?",
+        message:
+          "Hợp đồng sẽ đóng và hệ thống ghi nhận khấu trừ, hoàn cọc theo số liệu đã nhập. Hãy kiểm tra kỹ trước khi xác nhận.",
+        confirmLabel: "Quyết toán và trả phòng",
+        danger: true,
+      },
       description: `Cọc đang giữ: ${money(row.depositBalance)}. Cần thanh toán hết hóa đơn, gồm kỳ trả phòng. Số cọc còn lại sau khấu trừ được ghi nhận hoàn cho khách.`,
       fields: [
         dateField("closedDate", "Ngày trả phòng"),

@@ -26,6 +26,7 @@ public sealed class TenantPortalService(RentalDb database, IHttpContextAccessor 
         var roomIds = contracts.Select(x => x.RoomId).ToArray();
         var rooms = await db.Rooms.AsNoTracking().Where(x => roomIds.Contains(x.Id)).ToListAsync();
         var branchIds = rooms.Select(x => x.BranchId).ToArray();
+        var photos = await db.Attachments.AsNoTracking().Where(x => roomIds.Contains(x.EntityId) && x.EntityType == "room" && x.IsPublic && !x.IsArchived && (x.ContentType == "image/jpeg" || x.ContentType == "image/png")).OrderBy(x => x.SortOrder).ThenBy(x => x.Id).Select(x => new { x.Id, x.EntityId, x.SortOrder }).ToListAsync();
         var invoices = await db.Invoices.AsNoTracking().Include(x => x.Items).Where(x => contractIds.Contains(x.ContractId)).OrderByDescending(x => x.Year).ThenByDescending(x => x.Month).ToListAsync();
         var invoiceIds = invoices.Select(x => x.Id).ToArray();
         var payments = await db.Payments.AsNoTracking().Where(x => invoiceIds.Contains(x.InvoiceId)).OrderByDescending(x => x.PaidDate).ToListAsync();
@@ -35,7 +36,13 @@ public sealed class TenantPortalService(RentalDb database, IHttpContextAccessor 
             Today,
             Profile = await db.Tenants.Where(x => x.Id == tenantId).Select(x => new { x.FullName, x.Phone }).SingleAsync(),
             Branches = await db.Branches.Where(x => branchIds.Contains(x.Id)).Select(x => new { x.Id, x.Name, x.Address }).ToListAsync(),
-            Rooms = rooms.Select(x => new { x.Id, x.BranchId, x.Name }),
+            Rooms = rooms.Select(x => new { x.Id, x.BranchId, x.Name, x.Price, x.Capacity, x.Description,
+                x.Area, x.Floor, x.RoomType, x.Amenities, x.AmenitiesConfirmed, x.ToiletType, x.AccessHours,
+                x.LaundryType, x.ParkingType, x.MaxVehicles, x.PetsAllowed, x.ElectricVehiclesAllowed,
+                x.HasWindow, x.HasBalcony, x.SuggestedDeposit, x.MinimumLeaseMonths, x.Neighborhood,
+                x.RentalConditions, x.ContactName, x.ContactPhone,
+                Photos = photos.Where(p => p.EntityId == x.Id).Select(p => new { p.Id, p.SortOrder }) }),
+            Fees = await db.Fees.Where(x => branchIds.Contains(x.BranchId) && !x.IsArchived).Select(x => new { x.BranchId, x.Name, x.Method, x.UnitPrice }).ToListAsync(),
             Contracts = contracts.Select(x => new { x.Id, x.RoomId, x.StartDate, x.EndDate, x.ClosedDate, x.Rent, x.Deposit, x.Status,
                 DepositBalance = deposits.Where(d => d.ContractId == x.Id).Sum(d => d.Type == "Received" ? d.Amount : -d.Amount) }),
             Invoices = invoices.Select(x => new { x.Id, x.ContractId, x.Year, x.Month, x.DueDate, x.Total, x.Status, x.CancellationReason,
@@ -47,6 +54,14 @@ public sealed class TenantPortalService(RentalDb database, IHttpContextAccessor 
             Incidents = await db.Incidents.Where(x => x.ReportedByTenantId == tenantId).OrderByDescending(x => x.Id)
                 .Select(x => new { x.Id, x.RoomId, x.Description, x.Status, x.Resolution, x.CreatedAt }).ToListAsync()
         };
+    }
+
+    public async Task<Attachment> RoomPhoto(int roomId, int id)
+    {
+        var tenantId = await CurrentTenantId();
+        Require(await db.ContractTenants.Join(db.Contracts, ct => ct.ContractId, c => c.Id, (ct, c) => new { ct.TenantId, c.RoomId }).AnyAsync(x => x.TenantId == tenantId && x.RoomId == roomId), "Bạn không có quyền xem phòng này.", 403);
+        return await db.Attachments.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id && x.EntityType == "room" && x.EntityId == roomId && x.IsPublic && !x.IsArchived && (x.ContentType == "image/jpeg" || x.ContentType == "image/png"))
+            ?? throw new BusinessError("Không tìm thấy ảnh phòng.", 404);
     }
 
     public async Task<object> ReportIncident(TenantIncidentRequest r)

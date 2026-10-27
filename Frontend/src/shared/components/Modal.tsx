@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import { IconButton } from "./IconButton";
+import { useBodyScrollLock } from "../useBodyScrollLock";
 
 export function Modal({
   title,
@@ -14,16 +15,19 @@ export function Modal({
   close: () => void;
   wide?: boolean;
 }) {
+  useBodyScrollLock();
   useEffect(() => {
     const f = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (
+        e.key === "Escape" &&
+        !e.defaultPrevented &&
+        !document.querySelector("[data-confirmation], [data-photo-viewer]")
+      )
+        close();
     };
     document.addEventListener("keydown", f);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", f);
-      document.body.style.overflow = previous;
     };
   }, [close]);
   return (

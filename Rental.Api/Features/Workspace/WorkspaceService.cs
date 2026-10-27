@@ -25,7 +25,7 @@ public sealed class WorkspaceService(RentalDb database, IHttpContextAccessor acc
         var tenantIds = tenants.Select(x => x.Id).ToArray();
         var paymentIds = payments.Select(x => x.Id).ToArray();
         var incidentIds = incidents.Select(x => x.Id).ToArray();
-        var attachments = await db.Attachments.AsNoTracking().Where(x => (x.EntityType == "room" && roomIds.Contains(x.EntityId)) || (x.EntityType == "tenant" && tenantIds.Contains(x.EntityId)) || (x.EntityType == "contract" && contractIds.Contains(x.EntityId)) || (x.EntityType == "incident" && incidentIds.Contains(x.EntityId)) || (x.EntityType == "payment" && paymentIds.Contains(x.EntityId))).Select(x => new { x.Id, x.EntityType, x.EntityId, x.OriginalName, x.ContentType, x.Size, x.IsPublic }).ToListAsync();
+        var attachments = await db.Attachments.AsNoTracking().Where(x => !x.IsArchived && ((x.EntityType == "room" && roomIds.Contains(x.EntityId)) || (x.EntityType == "tenant" && tenantIds.Contains(x.EntityId)) || (x.EntityType == "contract" && contractIds.Contains(x.EntityId)) || (x.EntityType == "incident" && incidentIds.Contains(x.EntityId)) || (x.EntityType == "payment" && paymentIds.Contains(x.EntityId)))).OrderBy(x => x.SortOrder).ThenBy(x => x.Id).Select(x => new { x.Id, x.EntityType, x.EntityId, x.OriginalName, x.ContentType, x.Size, x.IsPublic, x.SortOrder }).ToListAsync();
         var bills = invoices.Select(x => new { x.Id, x.ContractId, x.Year, x.Month, x.DueDate, x.Total, x.Status, x.CancellationReason, x.Items, Paid = payments.Where(p => p.InvoiceId == x.Id).Sum(p => p.Amount), Outstanding = x.Status == "Cancelled" ? 0 : x.Total - payments.Where(p => p.InvoiceId == x.Id).Sum(p => p.Amount) }).ToList();
         var currentBills = bills.Where(x => x.Status == "Issued" && x.Year == Today.Year && x.Month == Today.Month).ToList();
         var active = contracts.Where(x => x.Status == "Active").ToList();
@@ -34,7 +34,12 @@ public sealed class WorkspaceService(RentalDb database, IHttpContextAccessor acc
         {
             Today,
             Branches = branches,
-            Rooms = rooms.Select(x => new { x.Id, x.BranchId, x.Name, x.Price, x.Capacity, x.Description, x.IsMaintenance, x.IsArchived, Status = x.IsArchived ? "Archived" : active.Any(c => c.RoomId == x.Id) ? "Occupied" : x.IsMaintenance ? "Maintenance" : "Available" }),
+            Rooms = rooms.Select(x => new { x.Id, x.BranchId, x.Name, x.Price, x.Capacity, x.Description, x.IsMaintenance, x.IsArchived,
+                x.Area, x.Floor, x.RoomType, x.Amenities, x.AmenitiesConfirmed, x.ToiletType, x.AccessHours,
+                x.LaundryType, x.ParkingType, x.MaxVehicles, x.PetsAllowed, x.ElectricVehiclesAllowed,
+                x.HasWindow, x.HasBalcony, x.SuggestedDeposit, x.MinimumLeaseMonths, x.Neighborhood,
+                x.RentalConditions, x.ContactName, x.ContactPhone,
+                Status = x.IsArchived ? "Archived" : active.Any(c => c.RoomId == x.Id) ? "Occupied" : x.IsMaintenance ? "Maintenance" : "Available" }),
             Tenants = tenants,
             Contracts = contracts.Select(x => new { x.Id, x.RoomId, x.StartDate, x.EndDate, x.ClosedDate, x.Rent, x.Deposit, x.Status, x.Note, DepositBalance = deposits.Where(d => d.ContractId == x.Id).Sum(d => d.Type == "Received" ? d.Amount : -d.Amount) }),
             ContractTenants = await db.ContractTenants.AsNoTracking().Where(x => contractIds.Contains(x.ContractId)).ToListAsync(),
@@ -58,7 +63,7 @@ public sealed class WorkspaceService(RentalDb database, IHttpContextAccessor acc
                 ExpiringContracts = active.Count(x => x.EndDate <= Today.AddDays(30)),
                 OpenIncidents = incidents.Count(x => x.Status != "Resolved")
             },
-            Users = IsOwner ? await db.Users.AsNoTracking().Select(x => new { x.Id, x.Username, x.FullName, x.Role, x.IsActive, x.TenantId }).ToListAsync() : null,
+            Users = IsOwner ? (await db.Users.AsNoTracking().ToListAsync()).Select(x => new { x.Id, x.Username, x.FullName, x.Role, x.IsActive, x.TenantId, x.Email, x.Phone, AvatarUrl = x.AvatarStoredName.Length > 0 ? $"/api/auth/avatar/{x.Id}?v={x.AvatarVersion}" : null }) : null,
             UserBranches = IsOwner ? await db.UserBranches.AsNoTracking().ToListAsync() : null,
             Audit = IsOwner ? await db.AuditEntries.AsNoTracking().OrderByDescending(x => x.Id).Take(30).ToListAsync() : null
         };

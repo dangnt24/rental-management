@@ -8,9 +8,10 @@ import { BillingPage } from "../features/billing/BillingPage";
 import { PaymentsPage } from "../features/payments/PaymentsPage";
 import { IncidentsPage } from "../features/incidents/IncidentsPage";
 import { SettingsPage } from "../features/settings/SettingsPage";
+import { AccountsPage } from "../features/accounts/AccountsPage";
 
 export function WorkspacePages() {
-  const { data, refreshing, loadError, reload, page } = useWorkspace();
+  const { data, refreshing, loadError, refresh, page } = useWorkspace();
   if (!data)
     return (
       <div className="empty">
@@ -18,13 +19,16 @@ export function WorkspacePages() {
         <p>{loadError || "Đang tải dữ liệu khu trọ…"}</p>
         <button
           className="button secondary"
-          onClick={() => reload().catch(() => {})}
+          onClick={() => refresh().catch(() => {})}
         >
+          <RefreshCw size={16} />
           Tải lại
         </button>
       </div>
     );
   switch (page) {
+    case "accounts":
+      return <AccountsPage />;
     case "overview":
       return <OverviewPage />;
     case "rooms":

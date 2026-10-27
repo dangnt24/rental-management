@@ -4,6 +4,7 @@ import { Toolbar } from "../../shared/components/Toolbar";
 import { useWorkspace } from "../../app/WorkspaceContext";
 import { useInvoiceColumns } from "../billing/useInvoiceColumns";
 import { usePaymentColumns } from "./usePaymentColumns";
+import { api } from "../../shared/api";
 
 export function PaymentsPage() {
   const {
@@ -15,6 +16,9 @@ export function PaymentsPage() {
     contractRoom,
     representative,
     payments,
+    setPaymentDetail,
+    setPrintBill,
+    setToast,
   } = useWorkspace();
   const billColumns = useInvoiceColumns();
   const paymentColumns = usePaymentColumns();
@@ -53,6 +57,11 @@ export function PaymentsPage() {
               tenant: representative(x.contractId),
             }))}
           columns={billColumns}
+          onRowOpen={(row) => {
+            api(`/invoices/${row.id}`)
+              .then(setPrintBill)
+              .catch((error) => setToast(error.message));
+          }}
           search={search}
         />
       </section>
@@ -60,10 +69,17 @@ export function PaymentsPage() {
         <div className="panel-header">
           <div>
             <h2>Lịch sử thu tiền</h2>
-            <p>Mỗi giao dịch giữ nguyên để dễ đối soát.</p>
+            <p>
+              Nhấp đúp vào dòng để xem chi tiết. Mỗi giao dịch giữ nguyên để đối
+              soát.
+            </p>
           </div>
         </div>
-        <Table rows={payments} columns={paymentColumns} />
+        <Table
+          rows={payments}
+          columns={paymentColumns}
+          onRowOpen={setPaymentDetail}
+        />
       </section>
     </>
   );

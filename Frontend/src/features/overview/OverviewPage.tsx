@@ -58,7 +58,7 @@ export function OverviewPage() {
         </div>
         <div className="welcome-graphic">
           <Home size={108} strokeWidth={0.8} />
-          <span>AN CƯ / {year}</span>
+          <span>DVP HOME / {year}</span>
         </div>
       </section>
       <div className="stats">

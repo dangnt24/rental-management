@@ -6,13 +6,19 @@ import {
   Users,
   ArrowUpRight,
   SlidersHorizontal,
+  RotateCcw,
+  X,
+  ChevronUp,
+  ChevronDown,
+  Maximize2,
 } from "lucide-react";
 import type { Row, User } from "../../shared/types";
 import { api } from "../../shared/api";
 import { money } from "../../shared/formatters";
-import { labels } from "../../shared/labels";
 import { SiteHeader } from "../../shared/components/SiteHeader";
 import { Modal } from "../../shared/components/Modal";
+import { useInteractionGuard } from "../../shared/InteractionGuard";
+import { RoomDetails } from "../rooms/RoomDetails";
 
 export function CatalogPage({
   user,
@@ -21,8 +27,11 @@ export function CatalogPage({
   user: User | null;
   focusSearch?: boolean;
 }) {
+  const { confirm } = useInteractionGuard();
   const searchForm = useRef<HTMLFormElement>(null);
+  const [filtersCollapsed, setFiltersCollapsed] = useState(false);
   function showSearch() {
+    setFiltersCollapsed(false);
     searchForm.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   useEffect(() => {
@@ -64,11 +73,36 @@ export function CatalogPage({
   function field(key: keyof typeof empty, value: string) {
     setFilters((old) => ({ ...old, [key]: value }));
   }
+  function queryFor(values: typeof empty) {
+    const params = new URLSearchParams();
+    Object.entries(values).forEach(([key, value]) => {
+      if (value.trim()) params.set(key, value.trim());
+    });
+    return params.toString();
+  }
+  const applied = new URLSearchParams(query);
+  const summary = [
+    applied.get("q") ? `“${applied.get("q")}”` : "",
+    data?.branches.find(
+      (branch: Row) => String(branch.id) === applied.get("branchId"),
+    )?.name || "Tất cả khu trọ",
+    applied.get("minPrice") || applied.get("maxPrice")
+      ? `${applied.get("minPrice") ? money(Number(applied.get("minPrice"))) : "0 ₫"} – ${applied.get("maxPrice") ? money(Number(applied.get("maxPrice"))) : "không giới hạn"}/tháng`
+      : "Không giới hạn giá",
+    applied.get("capacity") ? `Từ ${applied.get("capacity")} người` : "",
+    applied.get("sort") === "priceDesc"
+      ? "Giá cao đến thấp"
+      : applied.get("sort") === "name"
+        ? "Theo tên phòng"
+        : "Giá thấp đến cao",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const photo = (room: Row, id: number) =>
     `/api/public/rooms/${room.id}/photos/${id}`;
   return (
     <div className="public-site">
-      <SiteHeader user={user} onFindRooms={showSearch} />
+      <SiteHeader user={user} roomListing />
       <main className="catalog-main">
         <section className="catalog-hero">
           <div>
@@ -110,103 +144,142 @@ export function CatalogPage({
           className="catalog-filters panel"
           onSubmit={(e) => {
             e.preventDefault();
-            const params = new URLSearchParams();
-            Object.entries(filters).forEach(([key, value]) => {
-              if (value.trim()) params.set(key, value.trim());
-            });
-            setQuery(params.toString());
+            setQuery(queryFor(filters));
             setRetry((x) => x + 1);
           }}
         >
           <div className="filter-heading">
-            <SlidersHorizontal size={18} />
-            <strong>Tìm phòng phù hợp</strong>
-          </div>
-          <div className="catalog-filter-grid">
-            <label className="catalog-search">
-              Khu vực hoặc tên phòng
-              <input
-                placeholder="Nhập địa chỉ, khu trọ, tên phòng…"
-                value={filters.q}
-                maxLength={200}
-                onChange={(e) => field("q", e.target.value)}
-              />
-            </label>
-            <label>
-              Khu trọ
-              <select
-                value={filters.branchId}
-                onChange={(e) => field("branchId", e.target.value)}
-              >
-                <option value="">Tất cả khu</option>
-                {data?.branches.map((b: Row) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Giá từ (đ/tháng)
-              <input
-                type="number"
-                min={0}
-                step={100000}
-                value={filters.minPrice}
-                onChange={(e) => field("minPrice", e.target.value)}
-                placeholder="Không giới hạn"
-              />
-            </label>
-            <label>
-              Giá đến (đ/tháng)
-              <input
-                type="number"
-                min={filters.minPrice || 0}
-                step={100000}
-                value={filters.maxPrice}
-                onChange={(e) => field("maxPrice", e.target.value)}
-                placeholder="Không giới hạn"
-              />
-            </label>
-            <label>
-              Số người ở
-              <input
-                type="number"
-                min={1}
-                max={50}
-                value={filters.capacity}
-                onChange={(e) => field("capacity", e.target.value)}
-                placeholder="Bất kỳ"
-              />
-            </label>
-            <label>
-              Sắp xếp
-              <select
-                value={filters.sort}
-                onChange={(e) => field("sort", e.target.value)}
-              >
-                <option value="priceAsc">Giá thấp đến cao</option>
-                <option value="priceDesc">Giá cao đến thấp</option>
-                <option value="name">Tên phòng</option>
-              </select>
-            </label>
-          </div>
-          <div className="catalog-filter-actions">
+            <div className="filter-heading-copy">
+              <div>
+                <SlidersHorizontal size={18} />
+                <h2>Tìm phòng phù hợp</h2>
+              </div>
+              <p className="filter-summary" aria-live="polite">
+                {summary}
+              </p>
+              {filtersCollapsed && queryFor(filters) !== query && (
+                <p className="filter-draft-note">
+                  Bạn có thay đổi bộ lọc chưa áp dụng.
+                </p>
+              )}
+            </div>
             <button
               type="button"
               className="text-button"
-              onClick={() => {
-                setFilters(empty);
-                setQuery("sort=priceAsc");
-                setRetry((x) => x + 1);
-              }}
+              aria-expanded={!filtersCollapsed}
+              aria-controls="room-filter-fields"
+              onClick={() => setFiltersCollapsed((value) => !value)}
             >
-              Xóa bộ lọc
+              {filtersCollapsed ? (
+                <ChevronDown size={16} />
+              ) : (
+                <ChevronUp size={16} />
+              )}
+              {filtersCollapsed ? "Mở bộ lọc" : "Thu gọn"}
             </button>
-            <button className="button" disabled={loading}>
-              <Search size={17} />
-              Tìm phòng
-            </button>
+          </div>
+          <div
+            id="room-filter-fields"
+            className="catalog-filter-body"
+            hidden={filtersCollapsed}
+          >
+            <div className="catalog-filter-grid">
+              <label className="catalog-search">
+                Khu vực hoặc tên phòng
+                <input
+                  placeholder="Nhập địa chỉ, khu trọ, tên phòng…"
+                  value={filters.q}
+                  maxLength={200}
+                  onChange={(e) => field("q", e.target.value)}
+                />
+              </label>
+              <label>
+                Khu trọ
+                <select
+                  value={filters.branchId}
+                  onChange={(e) => field("branchId", e.target.value)}
+                >
+                  <option value="">Tất cả khu</option>
+                  {data?.branches.map((b: Row) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Giá từ (đ/tháng)
+                <input
+                  type="number"
+                  min={0}
+                  step={100000}
+                  value={filters.minPrice}
+                  onChange={(e) => field("minPrice", e.target.value)}
+                  placeholder="Không giới hạn"
+                />
+              </label>
+              <label>
+                Giá đến (đ/tháng)
+                <input
+                  type="number"
+                  min={filters.minPrice || 0}
+                  step={100000}
+                  value={filters.maxPrice}
+                  onChange={(e) => field("maxPrice", e.target.value)}
+                  placeholder="Không giới hạn"
+                />
+              </label>
+              <label>
+                Số người ở
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={filters.capacity}
+                  onChange={(e) => field("capacity", e.target.value)}
+                  placeholder="Bất kỳ"
+                />
+              </label>
+              <label>
+                Sắp xếp
+                <select
+                  value={filters.sort}
+                  onChange={(e) => field("sort", e.target.value)}
+                >
+                  <option value="priceAsc">Giá thấp đến cao</option>
+                  <option value="priceDesc">Giá cao đến thấp</option>
+                  <option value="name">Tên phòng</option>
+                </select>
+              </label>
+            </div>
+            <div className="catalog-filter-actions">
+              <button
+                type="button"
+                className="text-button"
+                onClick={async () => {
+                  if (
+                    !(await confirm({
+                      title: "Xóa toàn bộ bộ lọc?",
+                      message:
+                        "Các điều kiện tìm phòng sẽ được đặt lại về mặc định.",
+                      confirmLabel: "Xóa bộ lọc",
+                      danger: true,
+                    }))
+                  )
+                    return;
+                  setFilters(empty);
+                  setQuery("sort=priceAsc");
+                  setRetry((x) => x + 1);
+                }}
+              >
+                <RotateCcw size={16} />
+                Xóa bộ lọc
+              </button>
+              <button className="button" disabled={loading}>
+                <Search size={17} />
+                Tìm phòng
+              </button>
+            </div>
           </div>
         </form>
         <section id="room-list" aria-live="polite">
@@ -276,6 +349,13 @@ export function CatalogPage({
                     <p>
                       <Users size={15} />
                       Tối đa {room.capacity} người
+                      {room.area != null && (
+                        <>
+                          <span>·</span>
+                          <Maximize2 size={15} />
+                          {Number(room.area).toLocaleString("vi-VN")} m²
+                        </>
+                      )}
                     </p>
                     <div className="room-card-footer">
                       <strong>
@@ -305,57 +385,13 @@ export function CatalogPage({
           wide
           close={() => setSelected(null)}
         >
-          <div className="room-details">
-            <div className="room-gallery">
-              {selected.photos.length ? (
-                selected.photos.map((p: Row) => (
-                  <img
-                    key={p.id}
-                    src={photo(selected, p.id)}
-                    alt={`Ảnh phòng ${selected.name}`}
-                  />
-                ))
-              ) : (
-                <div className="room-photo-placeholder">
-                  <Building2 size={70} />
-                  <p>Ảnh phòng đang được cập nhật</p>
-                </div>
-              )}
-            </div>
-            <span className="eyebrow">{selected.branch.name}</span>
-            <h2>{money(selected.price)} / tháng</h2>
-            <p>
-              <MapPin size={16} /> {selected.branch.address}
-            </p>
-            <p>Tối đa {selected.capacity} người</p>
-            <p className="room-description">
-              {selected.description || "Chưa có mô tả bổ sung."}
-            </p>
-            <h3>Đơn giá dịch vụ</h3>
-            <div className="fee-list">
-              {selected.fees.length ? (
-                selected.fees.map((f: Row, i: number) => (
-                  <p key={i}>
-                    <span>
-                      {f.name} · {labels[f.method]}
-                    </span>
-                    <strong>{money(f.unitPrice)}</strong>
-                  </p>
-                ))
-              ) : (
-                <p>Chưa có phí dịch vụ được thiết lập.</p>
-              )}
-            </div>
-            <p className="muted">
-              Giá trên là giá thuê phòng mỗi tháng. Điện, nước và dịch vụ tính
-              riêng theo mức sử dụng. Tình trạng phòng có thể thay đổi.
-            </p>
-          </div>
+          <RoomDetails room={selected} photoUrl={(id) => photo(selected, id)} />
           <footer>
             <button
               className="button secondary"
               onClick={() => setSelected(null)}
             >
+              <X size={16} />
               Đóng
             </button>
           </footer>

@@ -4,18 +4,21 @@ import { useSession } from "../features/auth/useSession";
 import { WorkspaceProvider } from "./WorkspaceContext";
 import { AppLayout } from "./AppLayout";
 import { WorkspacePages } from "./WorkspacePages";
-import { useEffect, useState } from "react";
+import { useInteractionGuard } from "../shared/InteractionGuard";
 import { CatalogPage } from "../features/catalog/CatalogPage";
 import { TenantPortal } from "../features/tenantPortal/TenantPortal";
+import { AccountProvider } from "../features/accounts/AccountProvider";
 
 export function App() {
-  const { user, setUser, loading } = useSession();
-  const [route, setRoute] = useState(location.hash.slice(1) || "browse");
-  useEffect(() => {
-    const changed = () => setRoute(location.hash.slice(1) || "browse");
-    window.addEventListener("hashchange", changed);
-    return () => window.removeEventListener("hashchange", changed);
-  }, []);
+  const session = useSession();
+  return (
+    <AccountProvider user={session.user} setUser={session.setUser}>
+      <AppContent {...session} />
+    </AccountProvider>
+  );
+}
+function AppContent({ user, setUser, loading }: ReturnType<typeof useSession>) {
+  const { route, navigate } = useInteractionGuard();
   if (loading)
     return (
       <div className="full-loading">
@@ -34,13 +37,14 @@ export function App() {
       <Login
         loggedIn={(next) => {
           setUser(next);
-          location.hash = next.role === "Tenant" ? "tenant" : "overview";
+          void navigate(next.role === "Tenant" ? "tenant" : "overview");
         }}
       />
     );
   if (user.role === "Tenant")
     return (
       <TenantPortal
+        key={route}
         user={user}
         signedOut={() => {
           setUser(null);

@@ -4,10 +4,12 @@ export function IconButton({
   title,
   children,
   onClick,
+  disabled = false,
 }: {
   title: string;
   children: ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -16,6 +18,7 @@ export function IconButton({
       title={title}
       aria-label={title}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

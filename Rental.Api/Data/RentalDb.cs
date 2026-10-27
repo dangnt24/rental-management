@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Rental.Api.Domain;
+using Rental.Api.Features.Notifications;
 
 namespace Rental.Api.Data;
 
@@ -21,6 +22,8 @@ public sealed class RentalDb(DbContextOptions<RentalDb> options) : DbContext(opt
     public DbSet<Incident> Incidents => Set<Incident>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<EmailReminderSettings> EmailReminderSettings => Set<EmailReminderSettings>();
+    public DbSet<EmailReminder> EmailReminders => Set<EmailReminder>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -31,12 +34,25 @@ public sealed class RentalDb(DbContextOptions<RentalDb> options) : DbContext(opt
             t.HasCheckConstraint("ck_user_tenant", "(\"Role\" = 'Tenant' AND \"TenantId\" IS NOT NULL) OR (\"Role\" <> 'Tenant' AND \"TenantId\" IS NULL)");
         });
         b.Entity<User>().HasIndex(x => x.Username).IsUnique();
+        b.Entity<User>().Property(x => x.Email).HasMaxLength(254).HasDefaultValue("");
+        b.Entity<User>().Property(x => x.Phone).HasMaxLength(20).HasDefaultValue("");
+        b.Entity<User>().Property(x => x.AvatarStoredName).HasMaxLength(128).HasDefaultValue("");
+        b.Entity<User>().Property(x => x.AvatarVersion).HasDefaultValue(0);
         b.Entity<User>().HasIndex(x => x.TenantId).IsUnique();
         b.Entity<User>().HasOne<Tenant>().WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
         b.Entity<UserBranch>().ToTable("user_branches").HasKey(x => new { x.UserId, x.BranchId });
         b.Entity<UserBranch>().HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
         b.Entity<UserBranch>().HasOne<Branch>().WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Room>().ToTable("rooms", t => t.HasCheckConstraint("ck_room_values", "\"Price\" >= 0 AND \"Capacity\" BETWEEN 1 AND 50"));
+        b.Entity<Room>().ToTable("rooms", t =>
+        {
+            t.HasCheckConstraint("ck_room_values", "\"Price\" >= 0 AND \"Capacity\" BETWEEN 1 AND 50");
+            t.HasCheckConstraint("ck_room_details", "(\"Area\" IS NULL OR \"Area\" > 0 AND \"Area\" <= 5000) AND (\"MaxVehicles\" IS NULL OR \"MaxVehicles\" BETWEEN 0 AND 50) AND (\"SuggestedDeposit\" IS NULL OR \"SuggestedDeposit\" BETWEEN 0 AND 1000000000) AND (\"MinimumLeaseMonths\" IS NULL OR \"MinimumLeaseMonths\" BETWEEN 1 AND 120)");
+        });
+        foreach (var property in new[] { "Floor", "RoomType", "ToiletType", "AccessHours", "LaundryType", "ParkingType", "Neighborhood", "RentalConditions", "ContactName", "ContactPhone" })
+            b.Entity<Room>().Property<string>(property).HasDefaultValue("");
+        b.Entity<Room>().Property(x => x.Amenities).HasDefaultValueSql("ARRAY[]::text[]");
+        b.Entity<Room>().Property(x => x.AmenitiesConfirmed).HasDefaultValue(false);
+        b.Entity<Room>().Property(x => x.Area).HasPrecision(18, 3);
         b.Entity<Room>().HasOne<Branch>().WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
         b.Entity<Room>().HasIndex(x => new { x.BranchId, x.Name }).IsUnique();
         b.Entity<Tenant>().ToTable("tenants");
@@ -80,9 +96,33 @@ public sealed class RentalDb(DbContextOptions<RentalDb> options) : DbContext(opt
         b.Entity<Incident>().ToTable("incidents", t => t.HasCheckConstraint("ck_incident_values", "\"Cost\" >= 0 AND \"Status\" IN ('Open','InProgress','Resolved')"));
         b.Entity<Incident>().HasOne<Room>().WithMany().HasForeignKey(x => x.RoomId).OnDelete(DeleteBehavior.Restrict);
         b.Entity<Incident>().HasOne<Tenant>().WithMany().HasForeignKey(x => x.ReportedByTenantId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Attachment>().ToTable("attachments", t => t.HasCheckConstraint("ck_attachment_values", "\"Size\" > 0 AND \"EntityType\" IN ('room','tenant','contract','incident','payment')"));
+        b.Entity<Attachment>().ToTable("attachments", t =>
+        {
+            t.HasCheckConstraint("ck_attachment_values", "\"Size\" > 0 AND \"EntityType\" IN ('room','tenant','contract','incident','payment')");
+            t.HasCheckConstraint("ck_attachment_order", "\"SortOrder\" >= 0");
+        });
+        b.Entity<Attachment>().Property(x => x.SortOrder).HasDefaultValue(0);
         b.Entity<Attachment>().HasIndex(x => new { x.EntityType, x.EntityId });
         b.Entity<AuditEntry>().ToTable("audit_entries");
+        b.Entity<EmailReminderSettings>().ToTable("email_reminder_settings", t =>
+            t.HasCheckConstraint("ck_email_reminder_settings", "\"Id\" = 1 AND \"ContractDaysBefore\" BETWEEN 1 AND 90"));
+        b.Entity<EmailReminderSettings>().Property(x => x.Enabled).HasDefaultValue(false);
+        b.Entity<EmailReminderSettings>().Property(x => x.InvoiceEnabled).HasDefaultValue(true);
+        b.Entity<EmailReminderSettings>().Property(x => x.ContractEnabled).HasDefaultValue(true);
+        b.Entity<EmailReminderSettings>().Property(x => x.ContractDaysBefore).HasDefaultValue(7);
+        b.Entity<EmailReminder>().ToTable("email_reminders", t =>
+        {
+            t.HasCheckConstraint("ck_email_reminder_kind", "\"Kind\" IN ('InvoiceDue','ContractExpiry')");
+            t.HasCheckConstraint("ck_email_reminder_status", "\"Status\" IN ('Pending','Sending','Sent','Failed','Skipped','Uncertain','Cancelled') AND \"Attempts\" >= 0");
+        });
+        b.Entity<EmailReminder>().HasIndex(x => x.DedupKey).IsUnique();
+        b.Entity<EmailReminder>().Property(x => x.Recipient).HasDefaultValue("");
+        b.Entity<EmailReminder>().Property(x => x.Subject).HasDefaultValue("");
+        b.Entity<EmailReminder>().Property(x => x.Error).HasDefaultValue("");
+        b.Entity<EmailReminder>().Property(x => x.Status).HasDefaultValue("Pending");
+        b.Entity<EmailReminder>().Property(x => x.Attempts).HasDefaultValue(0);
+        b.Entity<EmailReminder>().HasOne<Contract>().WithMany().HasForeignKey(x => x.ContractId).OnDelete(DeleteBehavior.Restrict);
+        b.Entity<EmailReminder>().HasOne<Tenant>().WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
         foreach (var entity in b.Model.GetEntityTypes())
         {
             foreach (var property in entity.GetProperties())
@@ -95,8 +135,17 @@ public sealed class RentalDb(DbContextOptions<RentalDb> options) : DbContext(opt
             }
         }
         b.Entity<User>().Property(x => x.Username).HasMaxLength(50);
+        b.Entity<EmailReminder>().Property(x => x.DedupKey).HasMaxLength(200);
+        b.Entity<EmailReminder>().Property(x => x.Recipient).HasMaxLength(254);
+        b.Entity<EmailReminder>().Property(x => x.Subject).HasMaxLength(300);
+        b.Entity<EmailReminder>().Property(x => x.Status).HasMaxLength(20);
+        b.Entity<EmailReminder>().Property(x => x.Kind).HasMaxLength(30);
+        b.Entity<EmailReminder>().Property(x => x.Error).HasMaxLength(500);
         b.Entity<User>().Property(x => x.FullName).HasMaxLength(100);
         b.Entity<User>().Property(x => x.Role).HasMaxLength(20);
+        b.Entity<User>().Property(x => x.Email).HasMaxLength(254);
+        b.Entity<User>().Property(x => x.Phone).HasMaxLength(20);
+        b.Entity<User>().Property(x => x.AvatarStoredName).HasMaxLength(128);
         b.Entity<Branch>().Property(x => x.Name).HasMaxLength(100);
         b.Entity<Room>().Property(x => x.Name).HasMaxLength(50);
         b.Entity<Tenant>().Property(x => x.FullName).HasMaxLength(100);

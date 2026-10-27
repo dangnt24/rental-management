@@ -4,12 +4,14 @@ import type { Row, User, Page, Field, FormDefinition } from "../shared/types";
 import { nav } from "./navigation";
 import { api } from "../shared/api";
 import { options } from "../shared/forms";
+import { useInteractionGuard } from "../shared/InteractionGuard";
 
 // Dữ liệu đã tải, bộ lọc và trạng thái dialog; nghiệp vụ form nằm ở từng feature.
 function useWorkspaceState(
   user: User,
   setUser: Dispatch<SetStateAction<User | null>>,
 ) {
+  const { route, navigate: navigateRoute, confirm } = useInteractionGuard();
   const [data, setData] = useState<Row | null>(null);
   const [page, setPage] = useState<Page>(
     (location.hash.slice(1) as Page) || "overview",
@@ -26,6 +28,7 @@ function useWorkspaceState(
     title: string;
   } | null>(null);
   const [printBill, setPrintBill] = useState<Row | null>(null);
+  const [paymentDetail, setPaymentDetail] = useState<Row | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   async function reload() {
@@ -57,25 +60,37 @@ function useWorkspaceState(
       return () => clearTimeout(id);
     }
   }, [toast]);
-  function navigate(next: Page) {
-    setPage(next);
-    location.hash = next;
-    setSearch("");
-    setStatus("");
-    setShowMenu(false);
+  useEffect(() => {
+    const updated = () => {
+      reload().catch(() => {});
+    };
+    window.addEventListener("account-profile-updated", updated);
+    return () => window.removeEventListener("account-profile-updated", updated);
+  }, []);
+  async function navigate(next: Page) {
+    if (await navigateRoute(next)) setShowMenu(false);
   }
   useEffect(() => {
-    const change = () => {
-      const hash = location.hash.slice(1) as Page;
-      if (nav.some((x) => x.id === hash)) {
-        setPage(hash);
-        setSearch("");
-        setStatus("");
-      }
-    };
-    window.addEventListener("hashchange", change);
-    return () => window.removeEventListener("hashchange", change);
-  }, []);
+    if (nav.some((x) => x.id === route)) {
+      setPage(route as Page);
+      setForm(null);
+      setFileTarget(null);
+      setPrintBill(null);
+      setPaymentDetail(null);
+      setSearch("");
+      setStatus("");
+    }
+  }, [route]);
+  async function refresh() {
+    if (
+      await confirm({
+        title: "Làm mới dữ liệu?",
+        message: "Tải lại danh sách và số liệu mới nhất từ máy chủ.",
+        confirmLabel: "Làm mới",
+      })
+    )
+      await reload();
+  }
   const owner = user.role === "Owner";
   const all = (name: string): Row[] => data?.[name] || [];
   const rooms = all("rooms").filter((x) => !branch || x.branchId === branch);
@@ -158,11 +173,14 @@ function useWorkspaceState(
     setFileTarget,
     printBill,
     setPrintBill,
+    paymentDetail,
+    setPaymentDetail,
     showMenu,
     setShowMenu,
     refreshing,
     setRefreshing,
     reload,
+    refresh,
     completed,
     navigate,
     owner,

@@ -24,6 +24,9 @@ using Rental.Api.Features.Attachments;
 using Rental.Api.Features.Workspace;
 using Rental.Api.Features.Catalog;
 using Rental.Api.Features.TenantPortal;
+using Rental.Api.Features.Notifications;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 // Cấu hình riêng của máy không đưa lên Git; môi trường/CLI vẫn có độ ưu tiên cao hơn.
@@ -49,10 +52,25 @@ builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IncidentService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<AttachmentService>();
 builder.Services.AddScoped<WorkspaceService>();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<TenantPortalService>();
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("EmailSmtp"));
+builder.Services.AddScoped<ReminderComposer>();
+builder.Services.AddScoped<EmailReminderQueue>();
+builder.Services.AddScoped<SmtpEmailSender>();
+builder.Services.AddScoped<EmailReminderJob>();
+builder.Services.AddScoped<EmailReminderService>();
+var hangfireEnabled = builder.Configuration.GetValue("Hangfire:Enabled", true);
+if (hangfireEnabled)
+{
+    builder.Services.AddHangfire(config => config.UseSimpleAssemblyNameTypeSerializer().UseRecommendedSerializerSettings()
+        .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("Rental")),
+            new PostgreSqlStorageOptions { SchemaName = "hangfire", QueuePollInterval = TimeSpan.FromSeconds(2) }));
+    builder.Services.AddHangfireServer(options => { options.WorkerCount = 1; options.ServerName = $"dvp-home:{Environment.MachineName}:{Environment.ProcessId}"; });
+}
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
 {
     o.Cookie.Name = "rental.session";
@@ -124,7 +142,34 @@ using (var scope = app.Services.CreateScope())
         await db.Database.ExecuteSqlRawAsync(sql);
         await tx.CommitAsync();
     }
+    try
+    {
+        await db.Rooms.Select(x => new { x.Area, x.Amenities, x.ContactPhone }).Take(1).ToListAsync();
+    }
+    catch (Npgsql.PostgresException ex) when (ex.SqlState == "42703")
+    {
+        throw new InvalidOperationException("Database chưa có thông tin chi tiết phòng. Chạy Database/05_room_details.sql.", ex);
+    }
+    try
+    {
+        await db.Attachments.OrderBy(x => x.Id).Select(x => x.SortOrder).Take(1).ToListAsync();
+    }
+    catch (Npgsql.PostgresException ex) when (ex.SqlState == "42703")
+    {
+        throw new InvalidOperationException("Database chưa có thứ tự ảnh. Chạy Database/07_attachment_order.sql.", ex);
+    }
+    try { await db.Users.OrderBy(x => x.Id).Select(x => new { x.Email, x.Phone, x.AvatarStoredName, x.AvatarVersion }).Take(1).ToListAsync(); }
+    catch (Npgsql.PostgresException ex) when (ex.SqlState == "42703")
+    { throw new InvalidOperationException("Database chưa có hồ sơ tài khoản. Chạy Database/08_account_profile.sql.", ex); }
+    try { await db.EmailReminderSettings.OrderBy(x => x.Id).Take(1).ToListAsync(); }
+    catch (Npgsql.PostgresException ex) when (ex.SqlState is "42P01" or "42703")
+    { throw new InvalidOperationException("Database chưa có nhắc email. Chạy Database/09_email_reminders.sql.", ex); }
+    if (!await db.EmailReminderSettings.AnyAsync()) { db.EmailReminderSettings.Add(new EmailReminderSettings { Id = 1 }); await db.SaveChangesAsync(); }
 }
+
+if (hangfireEnabled)
+    app.Services.GetRequiredService<IRecurringJobManager>().AddOrUpdate<EmailReminderJob>("dvp-daily-email-reminders",
+        job => job.ScanAndQueue(false, CancellationToken.None), "0 9 * * *", new RecurringJobOptions { TimeZone = ReminderComposer.VietnamTime });
 
 app.Use(async (ctx, next) =>
 {
@@ -184,13 +229,19 @@ app.MapPost("/api/auth/login", async (LoginRequest r, RentalDb db, HttpContext c
     BusinessRules.Require(valid, "Tên đăng nhập hoặc mật khẩu không đúng.", 401);
     var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user!.Id.ToString()), new Claim(ClaimTypes.Name, user.Username), new Claim(ClaimTypes.Role, user.Role), new Claim("tenant", user.TenantId?.ToString() ?? ""), new Claim("credential", CredentialStamp(user.PasswordHash)) }, CookieAuthenticationDefaults.AuthenticationScheme);
     await context.SignInAsync(new ClaimsPrincipal(identity));
-    return Results.Ok(new { user.Id, user.Username, user.FullName, user.Role });
+    return Results.Ok(UserService.View(user));
 }).RequireRateLimiting("login");
 var api = app.MapGroup("/api").RequireAuthorization().AddEndpointFilter<WriteTransactionFilter>();
 api.MapGet("/auth/me", async (HttpContext context, RentalDb db) =>
 {
     var id = int.Parse(context.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-    return await db.Users.Where(x => x.Id == id).Select(x => new { x.Id, x.Username, x.FullName, x.Role }).SingleAsync();
+    return UserService.View(await db.Users.SingleAsync(x => x.Id == id));
+});
+api.MapPut("/auth/profile", (HttpRequest request, ProfileService service) => service.Update(request, dataDirectory));
+api.MapGet("/auth/avatar/{id:int}", async (int id, ProfileService service) =>
+{
+    var avatar = await service.Avatar(id, dataDirectory);
+    return Results.File(avatar.Path, avatar.ContentType);
 });
 api.MapPost("/auth/logout", async (HttpContext c) =>
 {
@@ -214,6 +265,13 @@ publicApi.MapGet("/rooms/{roomId:int}/photos/{id:int}", async (int roomId, int i
 });
 var tenantApi = api.MapGroup("/tenant").RequireAuthorization(p => p.RequireRole("Tenant"));
 tenantApi.MapGet("/workspace", (TenantPortalService s) => s.Workspace());
+tenantApi.MapGet("/rooms/{roomId:int}/photos/{id:int}", async (int roomId, int id, TenantPortalService s) =>
+{
+    var photo = await s.RoomPhoto(roomId, id);
+    var path = Path.Combine(dataDirectory, "uploads", Path.GetFileName(photo.StoredName));
+    BusinessRules.Require(File.Exists(path), "Ảnh không còn trên máy chủ.", 404);
+    return Results.File(path, photo.ContentType, enableRangeProcessing: true);
+});
 tenantApi.MapPost("/incidents", (TenantIncidentRequest r, TenantPortalService s) => s.ReportIncident(r));
 
 var staff = api.MapGroup("").RequireAuthorization(p => p.RequireRole("Owner", "Manager"));
@@ -261,6 +319,13 @@ staff.MapPut("/incidents/{id:int}", (int id, IncidentRequest r, IncidentService 
 staff.MapPost("/users", (UserRequest r, UserService s) => s.UpsertUser(null, r));
 staff.MapPut("/users/{id:int}", (int id, UserRequest r, UserService s) => s.UpsertUser(id, r));
 staff.MapAttachmentEndpoints(dataDirectory);
+// Queue mail có giao dịch riêng: chỉ enqueue Hangfire sau khi outbox đã commit.
+var mailApi = app.MapGroup("/api/email-reminders").RequireAuthorization(policy => policy.RequireRole("Owner", "Manager"));
+mailApi.MapGet("", (EmailReminderService service) => service.Overview());
+mailApi.MapGet("/preview", (string kind, int entityId, EmailReminderService service) => service.Preview(kind, entityId));
+mailApi.MapPut("/settings", async (ReminderSettingsRequest request, EmailReminderService service) => { await service.SaveSettings(request); return Results.NoContent(); });
+mailApi.MapPost("/send", (ManualEmailRequest request, EmailReminderService service) => service.Manual(request));
+mailApi.MapPost("/run", (EmailReminderService service) => service.ScanNow());
 app.MapFallback(async context =>
 {
     if (context.Request.Path.StartsWithSegments("/api"))
@@ -304,8 +369,15 @@ public sealed class WriteTransactionFilter(RentalDb db) : IEndpointFilter
             }
             catch
             {
-                if (context.HttpContext.Items["uploaded_file"] is string path && File.Exists(path))
-                    File.Delete(path);
+                if (context.HttpContext.Items["uploaded_files"] is List<string> paths)
+                    foreach (var path in paths)
+                    {
+                        try { if (File.Exists(path)) File.Delete(path); }
+                        catch (Exception cleanupError) when (cleanupError is IOException or UnauthorizedAccessException)
+                        {
+                            context.HttpContext.RequestServices.GetRequiredService<ILogger<WriteTransactionFilter>>().LogWarning(cleanupError, "Không dọn được file của lượt upload thất bại.");
+                        }
+                    }
                 throw;
             }
         }

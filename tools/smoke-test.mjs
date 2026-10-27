@@ -37,6 +37,7 @@ const server = spawn(
     env: {
       ...process.env,
       ASPNETCORE_ENVIRONMENT: "Development",
+      Hangfire__Enabled: "false",
       ConnectionStrings__Rental: testConnection,
       Database__SeedDemo: "true",
       Database__DataDirectory: testDir,
@@ -107,6 +108,33 @@ try {
   const admin = await login("admin");
   const manager = await login("manager");
   const manager2 = await login("manager2");
+  const emailOverview = (
+    await request("/email-reminders", "GET", undefined, admin)
+  ).data;
+  assert.equal(emailOverview.settings.enabled, false);
+  assert.equal(emailOverview.delivery.jobsEnabled, false);
+  assert(!JSON.stringify(emailOverview).includes("password"));
+  await request("/email-reminders", "GET", undefined, manager, 403);
+  await request("/email-reminders/run", "POST", undefined, manager, 403);
+  await request(
+    "/email-reminders/preview?kind=InvoiceDue&entityId=1",
+    "GET",
+    undefined,
+    manager2,
+    403,
+  );
+  await request(
+    "/email-reminders/settings",
+    "PUT",
+    {
+      enabled: true,
+      invoiceEnabled: true,
+      contractEnabled: true,
+      contractDaysBefore: 7,
+    },
+    admin,
+    400,
+  );
   let workspace = (await request("/workspace", "GET", undefined, admin)).data;
   assert.equal(workspace.rooms.length, 8);
   assert.equal(workspace.summary.occupiedRooms, 3);
@@ -166,11 +194,11 @@ try {
   assert(portal.rooms.every((r) => r.id === 1));
   assert.equal(portal.users, undefined);
   assert.equal(portal.profile.identityNumber, undefined);
-  const otherPortal = (
+  const otherRoomPortal = (
     await request("/tenant/workspace", "GET", undefined, tenant2)
   ).data;
   assert.deepEqual(
-    otherPortal.contracts.map((c) => c.id),
+    otherRoomPortal.contracts.map((c) => c.id),
     [3],
   );
   await request("/tenant/workspace", "GET", undefined, undefined, 401);
@@ -187,6 +215,7 @@ try {
     "/payments",
     "/incidents",
     "/users",
+    "/email-reminders/send",
   ])
     await request(path, "POST", {}, tenant, 403);
   await request(
@@ -259,12 +288,28 @@ try {
   await request("/users", "POST", { ...account, tenantId: 1 }, admin, 400);
   await request("/users", "POST", account, manager, 403);
   const tenantAccount = (await request("/users", "POST", account, admin)).data;
-  await request("/users", "POST", { ...account, username: "tenant-closed", tenantId: 5 }, admin);
+  await request(
+    "/users",
+    "POST",
+    { ...account, username: "tenant-closed", tenantId: 5 },
+    admin,
+  );
   const closedTenant = await login("tenant-closed");
-  const history = (await request("/tenant/workspace", "GET", undefined, closedTenant)).data;
-  assert.deepEqual(history.contracts.map((c) => c.id), [4]);
+  const history = (
+    await request("/tenant/workspace", "GET", undefined, closedTenant)
+  ).data;
+  assert.deepEqual(
+    history.contracts.map((c) => c.id),
+    [4],
+  );
   assert.equal(history.contracts[0].status, "Closed");
-  await request("/tenant/incidents", "POST", { contractId: 4, description: "Hợp đồng đã đóng" }, closedTenant, 400);
+  await request(
+    "/tenant/incidents",
+    "POST",
+    { contractId: 4, description: "Hợp đồng đã đóng" },
+    closedTenant,
+    400,
+  );
   const newTenant = await login("tenant-test");
   assert.equal(
     (await request("/tenant/workspace", "GET", undefined, newTenant)).data
@@ -317,6 +362,116 @@ try {
   };
   const room = (await request("/rooms", "POST", roomBody, admin)).data;
   await request("/rooms", "POST", roomBody, admin, 409);
+  const roomDetails = {
+    area: 20.5,
+    floor: "Trệt",
+    roomType: "Room",
+    amenities: ["Bed", "Wifi", "Kitchen"],
+    amenitiesConfirmed: true,
+    toiletType: "Private",
+    accessHours: "Tự do",
+    laundryType: "None",
+    parkingType: "Shared",
+    maxVehicles: 2,
+    petsAllowed: false,
+    electricVehiclesAllowed: false,
+    hasWindow: true,
+    hasBalcony: false,
+    suggestedDeposit: 3000000,
+    minimumLeaseMonths: 6,
+    neighborhood: "Khu vực mẫu, không công bố khoảng cách chưa xác nhận.",
+    rentalConditions: "Thông tin chi phí mẫu.",
+    contactName: "Ban quản lý công khai",
+    contactPhone: "+84000000000",
+  };
+  const oldRoomBody = Object.fromEntries(
+    [
+      "branchId",
+      "name",
+      "price",
+      "capacity",
+      "isMaintenance",
+      "description",
+    ].map((key) => [key, workspace.rooms.find((r) => r.id === 1)[key]]),
+  );
+  await request(
+    "/rooms/1",
+    "PUT",
+    { ...oldRoomBody, details: roomDetails },
+    tenant,
+    403,
+  );
+  await request(
+    "/rooms/1",
+    "PUT",
+    { ...oldRoomBody, details: roomDetails },
+    manager2,
+    403,
+  );
+  await request(
+    "/rooms/1",
+    "PUT",
+    { ...oldRoomBody, details: roomDetails },
+    manager,
+  );
+  const enrichedPortal = (
+    await request("/tenant/workspace", "GET", undefined, tenant)
+  ).data;
+  assert.equal(enrichedPortal.rooms[0].area, 20.5);
+  assert.equal(enrichedPortal.rooms[0].petsAllowed, false);
+  assert.equal(enrichedPortal.rooms[0].contactName, roomDetails.contactName);
+  assert(enrichedPortal.fees.every((f) => f.branchId === 1));
+  const publicRoomBody = Object.fromEntries(
+    [
+      "branchId",
+      "name",
+      "price",
+      "capacity",
+      "isMaintenance",
+      "description",
+    ].map((key) => [key, workspace.rooms.find((r) => r.id === 8)[key]]),
+  );
+  await request(
+    "/rooms/8",
+    "PUT",
+    { ...publicRoomBody, details: roomDetails },
+    admin,
+  );
+  await request("/rooms/8", "PUT", publicRoomBody, admin); // Client cũ không gửi Details không được xóa thông tin mới.
+  const enrichedPublic = (
+    await request("/public/rooms?branchId=2")
+  ).data.rooms.find((r) => r.id === 8);
+  assert.equal(enrichedPublic.area, 20.5);
+  assert.deepEqual(enrichedPublic.amenities, roomDetails.amenities);
+  assert.equal(enrichedPublic.petsAllowed, false);
+  assert.equal(enrichedPublic.suggestedDeposit, 3000000);
+  assert.equal(
+    (await request("/public/rooms")).data.rooms.some((r) => r.id === 1),
+    false,
+  );
+  const enrichedOtherPortal = (
+    await request("/tenant/workspace", "GET", undefined, tenant2)
+  ).data;
+  assert(enrichedOtherPortal.rooms.every((r) => r.id !== 1));
+  assert(enrichedOtherPortal.fees.every((f) => f.branchId === 2));
+  for (const invalidDetails of [
+    { area: 0 },
+    { area: 20.1234 },
+    { amenities: ["Unknown"], amenitiesConfirmed: true },
+    { amenities: ["Wifi"], amenitiesConfirmed: false },
+    { parkingType: "None", maxVehicles: 2 },
+    { minimumLeaseMonths: 0 },
+    { contactPhone: "javascript:alert(1)" },
+    { roomType: "Fake" },
+  ]) {
+    await request(
+      "/rooms/1",
+      "PUT",
+      { ...oldRoomBody, details: invalidDetails },
+      admin,
+      400,
+    );
+  }
   const today = workspace.today;
   const year = +today.slice(0, 4);
   const month = +today.slice(5, 7);
@@ -660,6 +815,145 @@ try {
   });
   assert.equal(bad.status, 400);
   passed++;
+  const occupiedPhotoBody = new FormData();
+  occupiedPhotoBody.append(
+    "file",
+    new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0])], {
+      type: "image/png",
+    }),
+    "occupied-room.png",
+  );
+  const occupiedPhotoUpload = await fetch(base + "/attachments/room/1", {
+    method: "POST",
+    headers: { Cookie: admin, "X-Rental-Request": "1" },
+    body: occupiedPhotoBody,
+  });
+  assert.equal(occupiedPhotoUpload.status, 200);
+  passed++;
+  const occupiedPhoto = await occupiedPhotoUpload.json();
+  await request(
+    `/tenant/rooms/1/photos/${occupiedPhoto.id}`,
+    "GET",
+    undefined,
+    tenant,
+    404,
+  );
+  await request(
+    `/attachments/${occupiedPhoto.id}/visibility`,
+    "POST",
+    { isPublic: true },
+    admin,
+    204,
+  );
+  const ownPhoto = await fetch(
+    base + `/tenant/rooms/1/photos/${occupiedPhoto.id}`,
+    { headers: { Cookie: tenant } },
+  );
+  assert.equal(ownPhoto.status, 200);
+  assert.equal((await ownPhoto.arrayBuffer()).byteLength, 9);
+  passed++;
+  await request(
+    `/tenant/rooms/1/photos/${occupiedPhoto.id}`,
+    "GET",
+    undefined,
+    tenant2,
+    403,
+  );
+  await request(
+    `/tenant/rooms/1/photos/${occupiedPhoto.id}`,
+    "GET",
+    undefined,
+    undefined,
+    401,
+  );
+  await request(
+    `/public/rooms/1/photos/${occupiedPhoto.id}`,
+    "GET",
+    undefined,
+    undefined,
+    404,
+  );
+  assert(
+    (await request("/tenant/workspace", "GET", undefined, tenant)).data.rooms
+      .find((r) => r.id === 1)
+      .photos.some((p) => p.id === occupiedPhoto.id),
+  );
+  await request(
+    `/attachments/${occupiedPhoto.id}`,
+    "DELETE",
+    undefined,
+    admin,
+    204,
+  );
+  await request(
+    `/tenant/rooms/1/photos/${occupiedPhoto.id}`,
+    "GET",
+    undefined,
+    tenant,
+    404,
+  );
+  // Xóa file phải theo phạm vi khu; file đã gỡ không còn ở trang công khai hay tải được.
+  await request(
+    `/attachments/${photo.id}/visibility`,
+    "POST",
+    { isPublic: true },
+    manager2,
+    204,
+  );
+  await request(`/attachments/${photo.id}`, "DELETE", undefined, tenant, 403);
+  await request(`/attachments/${photo.id}`, "DELETE", undefined, manager, 403);
+  await request(
+    `/attachments/${photo.id}`,
+    "DELETE",
+    undefined,
+    undefined,
+    401,
+  );
+  await request(`/attachments/${photo.id}`, "DELETE", undefined, manager2, 204);
+  await request(`/attachments/${photo.id}`, "GET", undefined, manager2, 404);
+  await request(
+    `/public/rooms/8/photos/${photo.id}`,
+    "GET",
+    undefined,
+    undefined,
+    404,
+  );
+  await request(
+    `/attachments/${photo.id}/visibility`,
+    "POST",
+    { isPublic: true },
+    admin,
+    404,
+  );
+  await request(`/attachments/${photo.id}`, "DELETE", undefined, admin, 404);
+  const afterFileDelete = (await request("/workspace", "GET", undefined, admin))
+    .data;
+  assert(!afterFileDelete.attachments.some((f) => f.id === photo.id));
+  assert(afterFileDelete.audit.some((a) => a.action === "attachment.delete"));
+  assert(
+    !(await request("/public/rooms?branchId=2")).data.rooms
+      .find((r) => r.id === 8)
+      .photos.some((p) => p.id === photo.id),
+  );
+  await request(
+    `/attachments/${attachment.id}`,
+    "DELETE",
+    undefined,
+    admin,
+    204,
+  );
+  await request(`/attachments/${attachment.id}`, "GET", undefined, admin, 404);
+  const { checkUploadsAndProfile } = await import("./uploads-profile-test.mjs");
+  await checkUploadsAndProfile({
+    base,
+    request,
+    admin,
+    manager,
+    manager2,
+    tenant,
+    tenant2,
+    testDir,
+  });
   await request("/auth/logout", "POST", undefined, admin, 204);
   console.log(
     `PASS: ${passed} HTTP checks; contract → reading → invoice → partial/concurrent payment → deposit → close; access control and attachments.`,

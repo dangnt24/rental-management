@@ -1,4 +1,10 @@
-import { CircleHelp, Paperclip } from "lucide-react";
+import {
+  CircleHelp,
+  Paperclip,
+  Wallet,
+  CalendarPlus,
+  LogOut,
+} from "lucide-react";
 import { money, date, code } from "../../shared/formatters";
 import { labels } from "../../shared/labels";
 import { Badge } from "../../shared/components/Badge";
@@ -7,6 +13,7 @@ import { Table } from "../../shared/components/Table";
 import { Toolbar } from "../../shared/components/Toolbar";
 import { useWorkspace } from "../../app/WorkspaceContext";
 import { useContractForms } from "./useContractForms";
+import { SendReminderButton } from "../notifications/SendReminderButton";
 
 export function ContractsPage() {
   const {
@@ -106,19 +113,28 @@ export function ContractsPage() {
                   </IconButton>
                   {r.status === "Active" && (
                     <>
+                      {r.endDate >= today && (
+                        <SendReminderButton
+                          kind="ContractExpiry"
+                          entityId={r.id}
+                        />
+                      )}
                       <button
                         className="text-button"
                         onClick={() => receiveDeposit(r)}
                       >
                         Nhận cọc
+                        <Wallet size={15} />
                       </button>
                       <button className="text-button" onClick={() => renew(r)}>
+                        <CalendarPlus size={15} />
                         Gia hạn
                       </button>
                       <button
                         className="text-button danger"
                         onClick={() => closeContract(r)}
                       >
+                        <LogOut size={15} />
                         Trả phòng
                       </button>
                     </>

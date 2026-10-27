@@ -11,7 +11,12 @@ import {
 } from "lucide-react";
 import type { Page } from "../shared/types";
 
-export const nav: { id: Page; label: string; icon: typeof Home }[] = [
+export const nav: {
+  id: Page;
+  label: string;
+  icon: typeof Home;
+  ownerOnly?: boolean;
+}[] = [
   { id: "overview", label: "Tổng quan", icon: LayoutDashboard },
   { id: "rooms", label: "Phòng trọ", icon: Building2 },
   { id: "tenants", label: "Người thuê", icon: Users },
@@ -19,5 +24,11 @@ export const nav: { id: Page; label: string; icon: typeof Home }[] = [
   { id: "billing", label: "Điện nước & hóa đơn", icon: ClipboardList },
   { id: "payments", label: "Thu tiền & công nợ", icon: Wallet },
   { id: "incidents", label: "Sự cố & bảo trì", icon: Wrench },
+  {
+    id: "accounts",
+    label: "Tài khoản & phạm vi quản lý",
+    icon: Users,
+    ownerOnly: true,
+  },
   { id: "settings", label: "Thiết lập", icon: Settings },
 ];

@@ -1,12 +1,14 @@
 import type { User } from "../types";
 import { BrandLogo } from "./BrandLogo";
+import { Search, LogIn, LayoutDashboard } from "lucide-react";
+import { AccountMenu } from "../../features/accounts/AccountMenu";
 
 export function SiteHeader({
   user,
-  onFindRooms,
+  roomListing = false,
 }: {
   user: User | null;
-  onFindRooms?: () => void;
+  roomListing?: boolean;
 }) {
   return (
     <header className="site-header">
@@ -14,22 +16,27 @@ export function SiteHeader({
         <BrandLogo />
       </a>
       <nav aria-label="Điều hướng chính">
-        <a
-          href="#browse/rooms"
-          onClick={() => {
-            if (location.hash === "#browse/rooms") onFindRooms?.();
-          }}
-        >
-          Tìm phòng
-        </a>
-        <a
-          className="button"
-          href={
-            user ? (user.role === "Tenant" ? "#tenant" : "#overview") : "#login"
-          }
-        >
-          {user ? "Không gian của tôi" : "Đăng nhập"}
-        </a>
+        {roomListing ? (
+          user && (
+            <a href={user.role === "Tenant" ? "#tenant" : "#overview"}>
+              <LayoutDashboard size={16} />
+              {user.role === "Tenant" ? "Trang người thuê" : "Trang quản trị"}
+            </a>
+          )
+        ) : (
+          <a href="#browse/rooms">
+            <Search size={16} />
+            Tìm phòng
+          </a>
+        )}
+        {user ? (
+          <AccountMenu />
+        ) : (
+          <a className="button" href="#login">
+            <LogIn size={16} />
+            Đăng nhập
+          </a>
+        )}
       </nav>
     </header>
   );

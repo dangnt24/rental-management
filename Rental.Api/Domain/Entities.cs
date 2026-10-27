@@ -17,6 +17,10 @@ public sealed class Branch : Entity
 
 public sealed class User : Entity
 {
+    public string Email { get; set; } = "";
+    public string Phone { get; set; } = "";
+    public string AvatarStoredName { get; set; } = "";
+    public int AvatarVersion { get; set; }
     public string Username { get; set; } = "";
     public string FullName { get; set; } = "";
     public string PasswordHash { get; set; } = "";
@@ -39,6 +43,26 @@ public sealed class Room : Entity
     public int Capacity { get; set; } = 2;
     public bool IsMaintenance { get; set; }
     public string Description { get; set; } = "";
+    public decimal? Area { get; set; }
+    public string Floor { get; set; } = "";
+    public string RoomType { get; set; } = "";
+    public string[] Amenities { get; set; } = [];
+    public bool AmenitiesConfirmed { get; set; }
+    public string ToiletType { get; set; } = "";
+    public string AccessHours { get; set; } = "";
+    public string LaundryType { get; set; } = "";
+    public string ParkingType { get; set; } = "";
+    public int? MaxVehicles { get; set; }
+    public bool? PetsAllowed { get; set; }
+    public bool? ElectricVehiclesAllowed { get; set; }
+    public bool? HasWindow { get; set; }
+    public bool? HasBalcony { get; set; }
+    public long? SuggestedDeposit { get; set; }
+    public int? MinimumLeaseMonths { get; set; }
+    public string Neighborhood { get; set; } = "";
+    public string RentalConditions { get; set; } = "";
+    public string ContactName { get; set; } = "";
+    public string ContactPhone { get; set; } = "";
 }
 
 public sealed class Tenant : Entity
@@ -139,6 +163,7 @@ public sealed class Incident : Entity
 
 public sealed class Attachment : Entity
 {
+    public int SortOrder { get; set; }
     public bool IsPublic { get; set; }
     public string EntityType { get; set; } = "";
     public int EntityId { get; set; }

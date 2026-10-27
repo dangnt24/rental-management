@@ -8,11 +8,15 @@ export function Table({
   columns,
   search = "",
   empty = "Chưa có dữ liệu phù hợp.",
+  onRowOpen,
+  resetKey,
 }: {
   rows: Row[];
   columns: Column[];
   search?: string;
   empty?: string;
+  onRowOpen?: (row: Row) => void;
+  resetKey?: string;
 }) {
   const [page, setPage] = useState(1);
   const pageSize = 8;
@@ -23,7 +27,7 @@ export function Table({
   );
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const current = Math.min(page, totalPages);
-  useEffect(() => setPage(1), [search]);
+  useEffect(() => setPage(1), [search, resetKey]);
   return (
     <>
       <div className="table-scroll">
@@ -39,7 +43,41 @@ export function Table({
             {filtered
               .slice((current - 1) * pageSize, current * pageSize)
               .map((row, i) => (
-                <tr key={row.id ?? i}>
+                <tr
+                  key={row.id ?? i}
+                  className={onRowOpen ? "openable-row" : undefined}
+                  tabIndex={onRowOpen ? 0 : undefined}
+                  title={
+                    onRowOpen
+                      ? "Nhấp đúp hoặc nhấn Enter để xem chi tiết"
+                      : undefined
+                  }
+                  onDoubleClick={
+                    onRowOpen
+                      ? (event) => {
+                          if (
+                            !(event.target as Element).closest(
+                              "button, a, input, select, textarea",
+                            )
+                          )
+                            onRowOpen(row);
+                        }
+                      : undefined
+                  }
+                  onKeyDown={
+                    onRowOpen
+                      ? (event) => {
+                          if (
+                            event.target === event.currentTarget &&
+                            (event.key === "Enter" || event.key === " ")
+                          ) {
+                            event.preventDefault();
+                            onRowOpen(row);
+                          }
+                        }
+                      : undefined
+                  }
+                >
                   {columns.map((col, j) => (
                     <td key={j}>{col.cell(row)}</td>
                   ))}

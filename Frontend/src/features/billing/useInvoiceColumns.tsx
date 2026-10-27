@@ -1,4 +1,4 @@
-import { FileText, X } from "lucide-react";
+import { FileText, X, Wallet } from "lucide-react";
 import type { Column } from "../../shared/types";
 import { money, date, code } from "../../shared/formatters";
 import { api } from "../../shared/api";
@@ -74,6 +74,7 @@ export function useInvoiceColumns() {
           </IconButton>
           {r.outstanding > 0 && (
             <button className="text-button" onClick={() => paymentForm(r)}>
+              <Wallet size={15} />
               Thu tiền
             </button>
           )}
@@ -83,6 +84,13 @@ export function useInvoiceColumns() {
               onClick={() =>
                 setForm({
                   title: "Hủy hóa đơn",
+                  confirmation: {
+                    title: "Xác nhận hủy hóa đơn?",
+                    message:
+                      "Hóa đơn sẽ mất hiệu lực. Lý do và lịch sử hủy vẫn được lưu để đối soát.",
+                    confirmLabel: "Hủy hóa đơn",
+                    danger: true,
+                  },
                   description:
                     "Giữ lại lịch sử hủy; sau đó có thể sửa chỉ số và lập lại kỳ này.",
                   fields: [

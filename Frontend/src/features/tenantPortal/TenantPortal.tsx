@@ -6,6 +6,11 @@ import {
   RefreshCw,
   Wallet,
   Wrench,
+  Eye,
+  Send,
+  KeyRound,
+  Printer,
+  X,
 } from "lucide-react";
 import type { Row, User } from "../../shared/types";
 import { api } from "../../shared/api";
@@ -15,6 +20,12 @@ import { SiteHeader } from "../../shared/components/SiteHeader";
 import { Table } from "../../shared/components/Table";
 import { Modal } from "../../shared/components/Modal";
 import { InvoiceContent } from "../../shared/components/InvoiceContent";
+import { AccountPanel } from "../accounts/AccountPanel";
+import { RoomDetails } from "../rooms/RoomDetails";
+import {
+  useInteractionGuard,
+  useUnsavedChanges,
+} from "../../shared/InteractionGuard";
 
 export function TenantPortal({
   user,
@@ -32,8 +43,18 @@ export function TenantPortal({
   const [contractId, setContractId] = useState("");
   const [description, setDescription] = useState("");
   const [bill, setBill] = useState<Row | null>(null);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState<Row | null>(null);
+  const { leave, confirm } = useInteractionGuard();
+  useUnsavedChanges(
+    tab === "incidents" ? !!description || !!contractId : false,
+    busy,
+  );
+  function clearDrafts() {
+    setSelectedRoom(null);
+    setBill(null);
+    setDescription("");
+    setContractId("");
+  }
   async function reload() {
     setLoading(true);
     setError("");
@@ -49,6 +70,15 @@ export function TenantPortal({
     reload();
   }, []);
   async function logout() {
+    if (
+      !(await leave({
+        always: true,
+        title: "Đăng xuất khỏi DVP Home?",
+        message: "Bạn cần đăng nhập lại để tiếp tục xem thông tin thuê phòng.",
+        confirmLabel: "Đăng xuất",
+      }))
+    )
+      return;
     setBusy(true);
     setError("");
     try {
@@ -98,7 +128,21 @@ export function TenantPortal({
             <button
               className="button secondary"
               disabled={loading}
-              onClick={reload}
+              onClick={async () => {
+                if (
+                  await leave({
+                    always: true,
+                    title: "Làm mới dữ liệu?",
+                    message:
+                      "Tải lại thông tin thuê phòng mới nhất từ máy chủ.",
+                    confirmLabel: "Làm mới",
+                    danger: false,
+                  })
+                ) {
+                  clearDrafts();
+                  await reload();
+                }
+              }}
             >
               <RefreshCw size={16} />
               Làm mới
@@ -163,6 +207,7 @@ export function TenantPortal({
             <nav className="tenant-tabs" aria-label="Chức năng người thuê">
               {[
                 ["contracts", "Hợp đồng"],
+                ["rooms", "Phòng của tôi"],
                 ["invoices", "Hóa đơn"],
                 ["payments", "Thanh toán"],
                 ["deposits", "Tiền cọc"],
@@ -173,7 +218,9 @@ export function TenantPortal({
                   key={id}
                   aria-current={tab === id ? "page" : undefined}
                   className={tab === id ? "active" : ""}
-                  onClick={() => {
+                  onClick={async () => {
+                    if (id === tab || !(await leave())) return;
+                    clearDrafts();
                     setTab(id);
                     setNotice("");
                   }}
@@ -183,6 +230,71 @@ export function TenantPortal({
               ))}
             </nav>
             <section className="panel tenant-panel">
+              {tab === "rooms" && (
+                <>
+                  <div className="panel-header">
+                    <div>
+                      <h2>Phòng của tôi</h2>
+                      <p>
+                        Tiện nghi, đơn giá hiện tại và quy định của các phòng có
+                        trong hợp đồng của bạn. Giá thuê thực tế xem tại mục Hợp
+                        đồng.
+                      </p>
+                    </div>
+                  </div>
+                  <Table
+                    rows={rows("rooms")}
+                    onRowOpen={setSelectedRoom}
+                    columns={[
+                      {
+                        label: "Phòng / khu trọ",
+                        cell: (room) => (
+                          <>
+                            <strong>{room.name}</strong>
+                            <small>
+                              {
+                                rows("branches").find(
+                                  (branch) => branch.id === room.branchId,
+                                )?.name
+                              }
+                            </small>
+                          </>
+                        ),
+                      },
+                      {
+                        label: "Diện tích / vị trí",
+                        cell: (room) => (
+                          <>
+                            {room.area != null
+                              ? `${Number(room.area).toLocaleString("vi-VN")} m²`
+                              : "Chưa cập nhật"}
+                            <small>{room.floor || "Chưa cập nhật tầng"}</small>
+                          </>
+                        ),
+                      },
+                      {
+                        label: "Tình trạng hợp đồng",
+                        cell: (room) =>
+                          active.some((contract) => contract.roomId === room.id)
+                            ? "Đang thuê"
+                            : "Lịch sử thuê",
+                      },
+                      {
+                        label: "",
+                        cell: (room) => (
+                          <button
+                            className="text-button"
+                            onClick={() => setSelectedRoom(room)}
+                          >
+                            <Eye size={16} />
+                            Xem chi tiết phòng
+                          </button>
+                        ),
+                      },
+                    ]}
+                  />
+                </>
+              )}
               {tab === "contracts" && (
                 <>
                   <div className="panel-header">
@@ -249,6 +361,7 @@ export function TenantPortal({
                             className="text-button"
                             onClick={() => openInvoice(i)}
                           >
+                            <Eye size={15} />
                             Chi tiết
                           </button>
                         ),
@@ -368,6 +481,7 @@ export function TenantPortal({
                         />
                       </label>
                       <button className="button" disabled={busy}>
+                        <Send size={16} />
                         {busy ? "Đang gửi…" : "Gửi yêu cầu"}
                       </button>
                     </form>
@@ -400,68 +514,7 @@ export function TenantPortal({
                   />
                 </>
               )}
-              {tab === "account" && (
-                <>
-                  <div className="panel-header">
-                    <div>
-                      <h2>Tài khoản của bạn</h2>
-                      <p>
-                        {data.profile.fullName} · {user.username} ·{" "}
-                        {data.profile.phone}
-                      </p>
-                    </div>
-                  </div>
-                  <form
-                    className="tenant-request-form"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      setBusy(true);
-                      setError("");
-                      try {
-                        await api("/auth/password", "POST", {
-                          currentPassword,
-                          newPassword,
-                        });
-                        signedOut();
-                      } catch (e) {
-                        setError((e as Error).message);
-                      } finally {
-                        setBusy(false);
-                      }
-                    }}
-                  >
-                    <label>
-                      Mật khẩu hiện tại
-                      <input
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                        maxLength={128}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      Mật khẩu mới (ít nhất 10 ký tự)
-                      <input
-                        type="password"
-                        autoComplete="new-password"
-                        required
-                        minLength={10}
-                        maxLength={128}
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                      />
-                    </label>
-                    <p className="muted">
-                      Sau khi đổi mật khẩu, bạn cần đăng nhập lại.
-                    </p>
-                    <button className="button" disabled={busy}>
-                      Đổi mật khẩu
-                    </button>
-                  </form>
-                </>
-              )}
+              {tab === "account" && <AccountPanel />}
             </section>
           </>
         )}
@@ -471,10 +524,43 @@ export function TenantPortal({
           <InvoiceContent bill={bill} />
           <footer>
             <button className="button secondary" onClick={() => setBill(null)}>
+              <X size={16} />
               Đóng
             </button>
             <button className="button" onClick={() => window.print()}>
+              <Printer size={16} />
               In / lưu PDF
+            </button>
+          </footer>
+        </Modal>
+      )}
+      {selectedRoom && (
+        <Modal
+          title={`Phòng ${selectedRoom.name}`}
+          wide
+          close={() => setSelectedRoom(null)}
+        >
+          <RoomDetails
+            room={{
+              ...selectedRoom,
+              branch: rows("branches").find(
+                (branch) => branch.id === selectedRoom.branchId,
+              ),
+              fees: rows("fees").filter(
+                (fee) => fee.branchId === selectedRoom.branchId,
+              ),
+            }}
+            photoUrl={(id) =>
+              `/api/tenant/rooms/${selectedRoom.id}/photos/${id}`
+            }
+          />
+          <footer>
+            <button
+              className="button secondary"
+              onClick={() => setSelectedRoom(null)}
+            >
+              <X size={16} />
+              Đóng
             </button>
           </footer>
         </Modal>
