@@ -1,0 +1,132 @@
+{
+  "Date": "2026-10-24",
+  "Purpose": "Lưu trữ tài liệu lịch sử; không xóa vĩnh viễn, không chỉnh sửa Source và không thực thi SQL.",
+  "Entries": [
+    {
+      "OriginalPath": "01.BasicDesign\\Description.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\01.BasicDesign\\Description.txt",
+      "Reason": "Mô tả, danh sách tính năng và prompt cũ đã được tổng hợp vào bản định hướng.",
+      "SHA256": "921CB2B8261BC311E9418E9FB00187A90EEC8412CAF7B56438499170E4687F93"
+    },
+    {
+      "OriginalPath": "01.BasicDesign\\DesignPromt.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\01.BasicDesign\\DesignPromt.txt",
+      "Reason": "Mô tả, danh sách tính năng và prompt cũ đã được tổng hợp vào bản định hướng.",
+      "SHA256": "009664C866C58147813EE3C0F12145D18C29657F698AE94F4864F54B9E9D2BF0"
+    },
+    {
+      "OriginalPath": "01.BasicDesign\\FunctionList.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\01.BasicDesign\\FunctionList.txt",
+      "Reason": "Mô tả, danh sách tính năng và prompt cũ đã được tổng hợp vào bản định hướng.",
+      "SHA256": "68A254EC043A47AFC93876330FE20722B6B8C4B6BD7A3654BEBB0F8CEAB22F20"
+    },
+    {
+      "OriginalPath": "Cache_Destop\\New Text Document.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\Cache_Destop\\New Text Document.txt",
+      "Reason": "Ghi chú tạm, yêu cầu sửa code cũ và nội dung cá nhân; lưu để tra cứu.",
+      "SHA256": "54201ED8EB6BE509EBFB8907F3C3119872957C987DC6D4AEA4329500B7C16D04"
+    },
+    {
+      "OriginalPath": "Cache_Destop\\rental.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\Cache_Destop\\rental.txt",
+      "Reason": "Ghi chú tạm, yêu cầu sửa code cũ và nội dung cá nhân; lưu để tra cứu.",
+      "SHA256": "8031E4BD6AE4DB79163FCB71A828241F13E5B283D52B371C3F0745CD58E64604"
+    },
+    {
+      "OriginalPath": "Cache_Destop\\seeds.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\Cache_Destop\\seeds.txt",
+      "Reason": "Ghi chú tạm, yêu cầu sửa code cũ và nội dung cá nhân; lưu để tra cứu.",
+      "SHA256": "E00F1815F68730025DB0BED528AB058277D982F85F2D0A60255BF5D83CF80CEE"
+    },
+    {
+      "OriginalPath": "Cache_Destop\\test.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\Cache_Destop\\test.txt",
+      "Reason": "Ghi chú tạm, yêu cầu sửa code cũ và nội dung cá nhân; lưu để tra cứu.",
+      "SHA256": "950EF04A215CA0DC726946159F4BBEDC0217CD160F1569D3CAB7B6BD214CC99B"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\add_refresh_token_columns.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\add_refresh_token_columns.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "ABF6157270A8A3BC8596F5868F99BB0819D3FFC15B4D9965BA743280CE0A6747"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\cleanup_legacy_tables.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\cleanup_legacy_tables.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "F150A0D43880AD25DE192FEB8CBCA6AD4A2CE3E6D26146C1D56F9B51EA1B1712"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\data_config.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\data_config.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "8309DD8793B4812937B50B1D4FF880799A8F9D04E89A6DF99D7633F73CF2F6CF"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\db_func.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\db_func.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "55C1DD40B14F8F3CEF5F2B711309626DE9C708FF3932768601F4CDB25C406651"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\db_indentity.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\db_indentity.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "03C30A49D4744D43E7F22D7625A343E7B6107F3F7C8F3B2A62A1B43BE62D9DCF"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\db.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\db.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "4254A3EA326E5D4751D6AFCD590F089BFD24A72AF3DCF3A3DB28B46D6258C0AE"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\fix_all_audit_fields.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\fix_all_audit_fields.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "E4FD5CF097737AA86F1664F4C6033EE50C82A843117BBB2FED6FECC5311FC721"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\seedData.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\seedData.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "33EF6B29490A5EB9143924DFCB53ACDDC7A8AD45BC811C2304FE98F7EFEB7ECB"
+    },
+    {
+      "OriginalPath": "02.Database\\Design\\struct_sport.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Design\\struct_sport.sql",
+      "Reason": "Các bản thiết kế và bản vá lịch sử, kèm dump dự án thể thao; chưa chọn làm cơ sở triển khai.",
+      "SHA256": "56EE16EA6439A5C40E450E71DF6BC334EB522CC9E864506DA97072B786DED586"
+    },
+    {
+      "OriginalPath": "02.Database\\Err\\rental_db.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\Err\\rental_db.sql",
+      "Reason": "Bản SQL thuộc nhóm Err, giữ lịch sử để đối chiếu.",
+      "SHA256": "5A42D6204BDF0920DBD2E8CAEA8E443E53DBE8B9B7EFDCF542CF35AFB207D1FC"
+    },
+    {
+      "OriginalPath": "02.Database\\V1\\rental_db.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\V1\\rental_db.sql",
+      "Reason": "Snapshot cũ có đồng thời hai cách đặt tên bảng; giữ lịch sử.",
+      "SHA256": "EF74CDA3D7C0889683792CD62B044FEF4185D95E948E91F19937D1C336B493B8"
+    },
+    {
+      "OriginalPath": "02.Database\\V2\\cache_data\\rental_schema.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\V2\\cache_data\\rental_schema.sql",
+      "Reason": "Snapshot cache cũ hơn bộ V2 bên ngoài; giữ để đối chiếu.",
+      "SHA256": "97776F7F613DD188D5FA90128E4E5C89B12E21B0D4B84C8017D67EFEAF16C11D"
+    },
+    {
+      "OriginalPath": "02.Database\\V2\\cache_data\\seed_data.sql",
+      "ArchivedPath": "_Archive\\2026-10-24\\02.Database\\V2\\cache_data\\seed_data.sql",
+      "Reason": "Snapshot cache cũ hơn bộ V2 bên ngoài; giữ để đối chiếu.",
+      "SHA256": "7E963A182510CD62E8BC58F877B65F71B57F70CFEAE641C86A96ED4767ECE8B6"
+    },
+    {
+      "OriginalPath": "promt.txt",
+      "ArchivedPath": "_Archive\\2026-10-24\\promt.txt",
+      "Reason": "Prompt cũ chứa thông tin tiến độ chưa đối chiếu với Source; đã tổng hợp mục tiêu.",
+      "SHA256": "C7627EC7DD321E758635AAF3D2662D5000229CE4E0A561AE11E5F4FA3C6D7A8D"
+    }
+  ]
+}
