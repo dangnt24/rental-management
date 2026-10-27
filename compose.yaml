@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: rental_management
+      POSTGRES_USER: rental
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-RentalLocalDemo_2026}
+    volumes:
+      - rental-postgres:/var/lib/postgresql/data
+      - ./Database/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./Database/02_sample.sql:/docker-entrypoint-initdb.d/02_sample.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rental -d rental_management"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:5247:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Rental: Host=db;Database=rental_management;Username=rental;Password=${POSTGRES_PASSWORD:-RentalLocalDemo_2026}
+      Database__SeedDemo: "false"
+    volumes:
+      - rental-files:/app/App_Data
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  rental-postgres:
+  rental-files:

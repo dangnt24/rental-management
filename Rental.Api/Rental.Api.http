@@ -1,6 +1,15 @@
 @Rental.Api_HostAddress = http://localhost:5247
 
-GET {{Rental.Api_HostAddress}}/weatherforecast/
+GET {{Rental.Api_HostAddress}}/api/health
 Accept: application/json
 
 ###
+
+POST {{Rental.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+X-Rental-Request: 1
+
+{"username":"admin","password":"Demo@123456"}
+
+### Sau khi đăng nhập, HTTP client cần lưu và gửi cookie rental.session.
+GET {{Rental.Api_HostAddress}}/api/workspace
